@@ -150,3 +150,91 @@ async function setup() {
 }
 
 setup();
+
+async function loadYakuTable() {
+  const baseURL = "https://somekata.github.io/baikinspoker/";
+  const res = await fetch(`${baseURL}data/yaku.json`);
+  const yakuData = await res.json();
+  const tableBody = document.getElementById("yaku-table-body");
+  if (!tableBody) return;
+
+  yakuData.forEach(yaku => {
+    const tr = document.createElement("tr");
+
+    const nameTd = document.createElement("td");
+    nameTd.textContent = yaku.yaku_name;
+    nameTd.style.border = "1px solid #333";
+    nameTd.style.padding = "0.5rem";
+
+    const descTd = document.createElement("td");
+    descTd.textContent = yaku.description;
+    descTd.style.border = "1px solid #333";
+    descTd.style.padding = "0.5rem";
+
+    const scoreTd = document.createElement("td");
+    scoreTd.textContent = yaku.score;
+    scoreTd.style.border = "1px solid #333";
+    scoreTd.style.padding = "0.5rem";
+
+    tr.appendChild(nameTd);
+    tr.appendChild(descTd);
+    tr.appendChild(scoreTd);
+    tableBody.appendChild(tr);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadYakuTable(); // ← INFO用役テーブル表示
+});
+async function loadCharaTable() {
+  const baseURL = "https://somekata.github.io/baikinspoker/";
+  const res = await fetch(`${baseURL}data/chara.json`);
+  const charaData = await res.json();
+  const tableBody = document.getElementById("chara-table-body");
+  if (!tableBody) return;
+
+  charaData.forEach(ch => {
+    const tr = document.createElement("tr");
+
+    const nameTd = document.createElement("td");
+    const name = ch.name || "";
+    const sci = ch.scientificNameEn || "";
+    nameTd.innerHTML = `${name} / ${sci}`;    
+    nameTd.style.border = "1px solid #333";
+    nameTd.style.padding = "0.5rem";
+
+    const typeTd = document.createElement("td");
+    typeTd.textContent = Array.isArray(ch.type) ? ch.type.join(", ") : ch.type || "";
+    typeTd.style.border = "1px solid #333";
+    typeTd.style.padding = "0.5rem";
+
+    const yakuTd = document.createElement("td");
+    const yakuList = [];
+
+    if (ch.yaku_type) yakuList.push(ch.yaku_type);
+    if (ch.yaku_area) {
+      if (Array.isArray(ch.yaku_area)) {
+        yakuList.push(...ch.yaku_area);
+      } else if (typeof ch.yaku_area === "object") {
+        yakuList.push(...Object.values(ch.yaku_area));
+      } else {
+        yakuList.push(ch.yaku_area);
+      }
+    }
+    if (ch.yaku_nature) yakuList.push(ch.yaku_nature);
+
+    yakuTd.textContent = [...new Set(yakuList)].join(" / ");
+    yakuTd.style.border = "1px solid #333";
+    yakuTd.style.padding = "0.5rem";
+
+    tr.appendChild(nameTd);
+    tr.appendChild(typeTd);
+    tr.appendChild(yakuTd);
+    tableBody.appendChild(tr);
+  });
+}
+
+// 既存のloadYakuTableと同じように呼び出す
+document.addEventListener("DOMContentLoaded", () => {
+  loadCharaTable();
+});
