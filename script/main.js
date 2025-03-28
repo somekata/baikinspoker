@@ -11,8 +11,9 @@ let isPlayerTurn = true;
 let historyLog = [];
 
 async function loadData() {
-  const charaRes = await fetch("../data/chara.json");
-  const yakuRes = await fetch("../data/yaku.json");
+  const baseURL = "https://somekata.github.io/baikinspoker/";
+  const charaRes = await fetch(`${baseURL}data/chara.json`);
+  const yakuRes = await fetch(`${baseURL}data/yaku.json`);  
   charaData = await charaRes.json();
   yakuData = await yakuRes.json();
 }
