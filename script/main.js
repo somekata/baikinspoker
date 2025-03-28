@@ -11,9 +11,8 @@ let isPlayerTurn = true;
 let historyLog = [];
 
 async function loadData() {
-  const baseURL = "https://somekata.github.io/baikinspoker/";
-  const charaRes = await fetch(`${baseURL}data/chara.json`);
-  const yakuRes = await fetch(`${baseURL}data/yaku.json`);  
+  const charaRes = await fetch("../data/chara.json");
+  const yakuRes = await fetch("../data/yaku.json");
   charaData = await charaRes.json();
   yakuData = await yakuRes.json();
 }
@@ -30,11 +29,7 @@ function displayHand(hand, containerId, selectable = false) {
     img.src = getCardImagePath(card);
     img.alt = card.name;
 
-    const label = document.createElement("p");
-    label.textContent = card.name;
-
     div.appendChild(img);
-    div.appendChild(label);
     container.appendChild(div);
 
     if (selectable) {
