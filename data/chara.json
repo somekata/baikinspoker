@@ -22,10 +22,17 @@
     "taxonomy.order": "<em>Lactobacillales<\/em>",
     "taxonomy.family": "<em>Streptococcaceae<\/em>",
     "area": ["N", "R"],
-    "nature": "宮殿",
+    "nature": {
+      "id": 1,
+      "name": "ハイエンキューキン王",
+      "area": "N,R",
+      "nature": "宮殿"
+    },
     "yaku_type": "オール陽性",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール宮殿"
+    "yaku_area": {
+      "N": "オール髄膜炎",
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 2,
@@ -50,10 +57,17 @@
     "taxonomy.order": "<em>Pasteurellales<\/em>",
     "taxonomy.family": "<em>Pasteurellaceae<\/em>",
     "area": ["N", "R"],
-    "nature": "宮殿",
+    "nature": {
+      "id": 2,
+      "name": "インフルエンザキンXV世女王",
+      "area": "N,R",
+      "nature": "宮殿"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール宮殿"
+    "yaku_area": {
+      "N": "オール髄膜炎",
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 3,
@@ -78,9 +92,15 @@
     "taxonomy.order": "<em>Mycoplasmatales<\/em>",
     "taxonomy.family": "<em>Mycoplasmataceae<\/em>",
     "area": "R",
-    "nature": "宮殿",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール宮殿"
+    "nature": {
+      "id": 3,
+      "name": "マイコプラズマ姫",
+      "area": "R",
+      "nature": "宮殿"
+    },
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 4,
@@ -105,9 +125,17 @@
     "taxonomy.order": "<em>Legionellales<\/em>",
     "taxonomy.family": "<em>Legionellaceae<\/em>",
     "area": "R",
-    "nature": "水",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール水系"
+    "nature": {
+      "id": 4,
+      "name": "レジオネラ爺や",
+      "area": "R",
+      "nature": "水"
+    },
+    "yaku_type": "オール陰性",
+    "yaku_area": {
+      "R": "オール肺感染"
+    },
+    "yaku_nature": "オール熱帯"
   },
   {
     "id": 5,
@@ -132,10 +160,19 @@
     "taxonomy.order": "<em>Enterobacterales<\/em>",
     "taxonomy.family": "<em>Enterobacteriaceae<\/em>",
     "area": ["N", "R", "E", "U"],
-    "nature": "水",
+    "nature": {
+      "id": 5,
+      "name": "ダイチョーキン",
+      "area": "N,R,E,U",
+      "nature": "水"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オールUTI",
-    "yaku_nature": "オール水系"
+    "yaku_area": {
+      "N": "オール髄膜炎",
+      "R": "オール肺感染",
+      "E": "オール腸炎",
+      "U": "オールUTI"
+    }
   },
   {
     "id": 6,
@@ -160,10 +197,16 @@
     "taxonomy.order": "<em>Enterobacterales<\/em>",
     "taxonomy.family": "<em>Enterobacteriaceae<\/em>",
     "area": "E",
-    "nature": "水",
+    "nature": {
+      "id": 6,
+      "name": "ベロダシ",
+      "area": "E",
+      "nature": "水"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オール腸炎",
-    "yaku_nature": "オール水系"
+    "yaku_area": {
+      "E": "オール腸炎"
+    }
   },
   {
     "id": 7,
@@ -188,10 +231,16 @@
     "taxonomy.order": "<em>Enterobacterales<\/em>",
     "taxonomy.family": "<em>Enterobacteriaceae<\/em>",
     "area": "E",
-    "nature": "水",
+    "nature": {
+      "id": 7,
+      "name": "シゲ裸族",
+      "area": "E",
+      "nature": "水"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オール腸炎",
-    "yaku_nature": "オール水系"
+    "yaku_area": {
+      "E": "オール腸炎"
+    }
   },
   {
     "id": 8,
@@ -216,10 +265,19 @@
     "taxonomy.order": "<em>Enterobacterales<\/em>",
     "taxonomy.family": "<em>Enterobacteriaceae<\/em>",
     "area": ["R", "E", "U"],
-    "nature": "水",
+    "nature": {
+      "id": 8,
+      "name": "クレブシエ裸族",
+      "area": "R,E,U",
+      "nature": "水"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オールUTI",
-    "yaku_nature": "オール水系"
+    "yaku_area": {
+      "R": "オール肺感染",
+      "E": "オール腸炎",
+      "U": "オールUTI"
+    },
+    "yaku_nature": "オール熱帯"
   },
   {
     "id": 9,
@@ -244,10 +302,16 @@
     "taxonomy.order": "<em>Vibrionales<\/em>",
     "taxonomy.family": "<em>Vibrionaceae<\/em>",
     "area": "E",
-    "nature": "水",
+    "nature": {
+      "id": 9,
+      "name": "ビブリ男コレラ",
+      "area": "E",
+      "nature": "水"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オール腸炎",
-    "yaku_nature": "オール水系"
+    "yaku_area": {
+      "E": "オール腸炎"
+    }
   },
   {
     "id": 10,
@@ -272,10 +336,19 @@
     "taxonomy.order": "<em>Pseudomonadales<\/em>",
     "taxonomy.family": "<em>Pseudomonadaceae<\/em>",
     "area": ["N", "R", "E", "U"],
-    "nature": "水",
+    "nature": {
+      "id": 10,
+      "name": "リョクノーキン",
+      "area": "N,R,E,U",
+      "nature": "水"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オールUTI",
-    "yaku_nature": "オール水系"
+    "yaku_area": {
+      "N": "オール髄膜炎",
+      "R": "オール肺感染",
+      "E": "オール腸炎",
+      "U": "オールUTI"
+    }
   },
   {
     "id": 11,
@@ -300,10 +373,17 @@
     "taxonomy.order": "<em>Pseudomonadales<\/em>",
     "taxonomy.family": "<em>Moraxellaceae<\/em>",
     "area": ["R", "U"],
-    "nature": "水",
+    "nature": {
+      "id": 11,
+      "name": "アシネトバクター",
+      "area": "R,U",
+      "nature": "水"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オールUTI",
-    "yaku_nature": "オール水系"
+    "yaku_area": {
+      "R": "オール肺感染",
+      "U": "オールUTI"
+    }
   },
   {
     "id": 12,
@@ -328,9 +408,17 @@
     "taxonomy.order": "<em>Enterobacterales<\/em>",
     "taxonomy.family": "<em>Enterobacteriaceae<\/em>",
     "area": "E",
-    "nature": "マクロファー寺",
+    "nature": {
+      "id": 12,
+      "name": "チフス和尚",
+      "area": "E",
+      "nature": "マクロファー寺"
+    },
     "yaku_type": "オール陰性",
-    "yaku_area": "オール腸炎"
+    "yaku_area": {
+      "E": "オール腸炎"
+    },
+    "yaku_nature": "オール熱帯"
   },
   {
     "id": 13,
@@ -355,9 +443,15 @@
     "taxonomy.order": "<em>Chlamydiales<\/em>",
     "taxonomy.family": "<em>Chlamydiaceae<\/em>",
     "area": "R",
-    "nature": "宮殿",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール宮殿"
+    "nature": {
+      "id": 13,
+      "name": "クラミジア・ニューモニエ侯",
+      "area": "R",
+      "nature": "宮殿"
+    },
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 14,
@@ -382,9 +476,15 @@
     "taxonomy.order": "<em>Chlamydiales<\/em>",
     "taxonomy.family": "<em>Chlamydiaceae<\/em>",
     "area": "R",
-    "nature": "宮殿",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール宮殿"
+    "nature": {
+      "id": 14,
+      "name": "クラミジア・シッタ氏",
+      "area": "R",
+      "nature": "宮殿"
+    },
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 15,
@@ -409,10 +509,19 @@
     "taxonomy.order": "<em>Caryophanales<\/em>",
     "taxonomy.family": "<em>Staphylococcaceae<\/em>",
     "area": ["N", "R", "E", "U"],
-    "nature": "野外",
+    "nature": {
+      "id": 15,
+      "name": "ブドーキューキン族（黄色部族）",
+      "area": "N,R,E,U",
+      "nature": "野外"
+    },
     "yaku_type": "オール陽性",
-    "yaku_area": "オールUTI",
-    "yaku_nature": "オール野外"
+    "yaku_area": {
+      "N": "オール髄膜炎",
+      "R": "オール肺感染",
+      "E": "オール腸炎",
+      "U": "オールUTI"
+    }
   },
   {
     "id": 16,
@@ -436,10 +545,18 @@
     "taxonomy.class": "<em>Actinomycetes<\/em>",
     "taxonomy.order": "<em>Mycobacteriales<\/em>",
     "taxonomy.family": "<em>Mycobacteriaceae<\/em>",
-    "area": "R",
-    "nature": "宮殿",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール宮殿"
+    "area": ["R", "E"],
+    "nature": {
+      "id": 16,
+      "name": "ケッカクキン",
+      "area": "R,E",
+      "nature": "宮殿"
+    },
+    "yaku_area": {
+      "R": "オール肺感染",
+      "E": "オール腸炎"
+    },
+    "yaku_nature": "オール熱帯"
   },
   {
     "id": 17,
@@ -464,9 +581,15 @@
     "taxonomy.order": "<em>Mycobacteriales<\/em>",
     "taxonomy.family": "<em>Mycobacteriaceae<\/em>",
     "area": "R",
-    "nature": "野外",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール野外"
+    "nature": {
+      "id": 17,
+      "name": "MAC",
+      "area": "R",
+      "nature": "野外"
+    },
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 18,
@@ -491,10 +614,16 @@
     "taxonomy.order": "<em>Onygenales<\/em>",
     "taxonomy.family": "<em>Onygenaceae<\/em>",
     "area": "R",
-    "nature": "熱帯",
+    "nature": {
+      "id": 18,
+      "name": "コクシジオイデス海賊王",
+      "area": "R",
+      "nature": "熱帯"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール熱帯"
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 19,
@@ -519,10 +648,16 @@
     "taxonomy.order": "<em>Onygenales<\/em>",
     "taxonomy.family": "<em>Ajellomycetaceae<\/em>",
     "area": "R",
-    "nature": "熱帯",
+    "nature": {
+      "id": 19,
+      "name": "ヒストプラズ魔王",
+      "area": "R",
+      "nature": "熱帯"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール熱帯"
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 20,
@@ -547,9 +682,16 @@
     "taxonomy.order": "<em>Onygenales<\/em>",
     "taxonomy.family": "<em>Ajellomycetaceae<\/em>",
     "area": "R",
-    "nature": "熱帯",
+    "nature": {
+      "id": 20,
+      "name": "パラコクシジオイデス",
+      "area": "R",
+      "nature": "熱帯"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
+    "yaku_area": {
+      "R": "オール肺感染"
+    },
     "yaku_nature": "オール熱帯"
   },
   {
@@ -575,10 +717,16 @@
     "taxonomy.order": "<em>Onygenales<\/em>",
     "taxonomy.family": "<em>Ajellomycetaceae<\/em>",
     "area": "R",
-    "nature": "熱帯",
+    "nature": {
+      "id": 21,
+      "name": "ミセス・ブラスト",
+      "area": "R",
+      "nature": "熱帯"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール熱帯"
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 22,
@@ -603,10 +751,16 @@
     "taxonomy.order": "<em>Eurotiales<\/em>",
     "taxonomy.family": "<em>Trichocomaceae<\/em>",
     "area": "R",
-    "nature": "熱帯",
+    "nature": {
+      "id": 22,
+      "name": "タラロマイセス・マルネッフェイ",
+      "area": "R",
+      "nature": "熱帯"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール熱帯"
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 23,
@@ -631,10 +785,17 @@
     "taxonomy.order": "<em>Tremellales<\/em>",
     "taxonomy.family": "<em>Cryptococcaceae<\/em>",
     "area": ["N", "R"],
-    "nature": "野外",
+    "nature": {
+      "id": 23,
+      "name": "クリプトコックス・ネオフォルマンス",
+      "area": "N,R",
+      "nature": "野外"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール野外"
+    "yaku_area": {
+      "N": "オール髄膜炎",
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 24,
@@ -659,9 +820,17 @@
     "taxonomy.order": "<em>Tremellales<\/em>",
     "taxonomy.family": "<em>Cryptococcaceae<\/em>",
     "area": ["N", "R"],
-    "nature": "熱帯",
+    "nature": {
+      "id": 24,
+      "name": "クリプトコックス・ガッティ",
+      "area": "N,R",
+      "nature": "熱帯"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
+    "yaku_area": {
+      "N": "オール髄膜炎",
+      "R": "オール肺感染"
+    },
     "yaku_nature": "オール熱帯"
   },
   {
@@ -687,10 +856,17 @@
     "taxonomy.order": "<em>Serinales<\/em>",
     "taxonomy.family": "<em>Debaryomycetaceae<\/em>",
     "area": ["E", "U"],
-    "nature": "宮殿",
+    "nature": {
+      "id": 25,
+      "name": "カンジダ",
+      "area": "E,U",
+      "nature": "宮殿"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オールUTI",
-    "yaku_nature": "オール宮殿"
+    "yaku_area": {
+      "E": "オール腸炎",
+      "U": "オールUTI"
+    }
   },
   {
     "id": 26,
@@ -715,10 +891,16 @@
     "taxonomy.order": "<em>Eurotiales<\/em>",
     "taxonomy.family": "<em>Aspergillaceae<\/em>",
     "area": "R",
-    "nature": "野外",
+    "nature": {
+      "id": 26,
+      "name": "アスペルギルス",
+      "area": "R",
+      "nature": "野外"
+    },
     "yaku_type": "オール真菌",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール野外"
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 27,
@@ -743,9 +925,14 @@
     "taxonomy.order": "<em>Saccharomycetales<\/em>",
     "taxonomy.family": "<em>Saccharomycetaceae<\/em>",
     "area": [],
-    "nature": "野外",
+    "nature": {
+      "id": 27,
+      "name": "コーボくん",
+      "area": "",
+      "nature": "野外"
+    },
     "yaku_type": "オール真菌",
-    "yaku_nature": "オール野外"
+    "yaku_area": {}
   },
   {
     "id": 28,
@@ -770,9 +957,15 @@
     "taxonomy.order": "<em>Eurotiales<\/em>",
     "taxonomy.family": "<em>Aspergillaceae<\/em>",
     "area": [],
-    "nature": "野外",
+    "nature": {
+      "id": 28,
+      "name": "こうじ君",
+      "area": "",
+      "nature": "野外"
+    },
     "yaku_type": "オール真菌",
-    "yaku_nature": "オール野外"
+    "yaku_area": {},
+    "yaku_nature": "オール熱帯"
   },
   {
     "id": 29,
@@ -797,10 +990,16 @@
     "taxonomy.order": "<em>Lactobacillales<\/em>",
     "taxonomy.family": "<em>Streptococcaceae<\/em>",
     "area": "R",
-    "nature": "宮殿",
+    "nature": {
+      "id": 29,
+      "name": "A軍連隊",
+      "area": "R",
+      "nature": "宮殿"
+    },
     "yaku_type": "オール陽性",
-    "yaku_area": "オール肺感染",
-    "yaku_nature": "オール宮殿"
+    "yaku_area": {
+      "R": "オール肺感染"
+    }
   },
   {
     "id": 30,
@@ -825,10 +1024,16 @@
     "taxonomy.order": "<em>Lactobacillales<\/em>",
     "taxonomy.family": "<em>Streptococcaceae<\/em>",
     "area": "N",
-    "nature": "宮殿",
+    "nature": {
+      "id": 30,
+      "name": "B軍連隊",
+      "area": "N",
+      "nature": "宮殿"
+    },
     "yaku_type": "オール陽性",
-    "yaku_area": "オール髄膜炎",
-    "yaku_nature": "オール宮殿"
+    "yaku_area": {
+      "N": "オール髄膜炎"
+    }
   },
   {
     "id": 31,
@@ -853,10 +1058,16 @@
     "taxonomy.order": "<em>Clostridiales<\/em>",
     "taxonomy.family": "<em>Clostridiaceae<\/em>",
     "area": "E",
-    "nature": "宮殿",
+    "nature": {
+      "id": 31,
+      "name": "ディフィシル",
+      "area": "E",
+      "nature": "宮殿"
+    },
     "yaku_type": "オール陽性",
-    "yaku_area": "オール腸炎",
-    "yaku_nature": "オール宮殿"
+    "yaku_area": {
+      "E": "オール腸炎"
+    }
   },
   {
     "id": 32,
@@ -881,9 +1092,17 @@
     "taxonomy.order": "<em>Caryophanales<\/em>",
     "taxonomy.family": "<em>Bacillaceae<\/em>",
     "area": ["R", "E"],
-    "nature": "野外",
+    "nature": {
+      "id": 32,
+      "name": "タンソ",
+      "area": "R,E",
+      "nature": "野外"
+    },
     "yaku_type": "オール陽性",
-    "yaku_area": "オール腸炎",
-    "yaku_nature": "オール野外"
+    "yaku_area": {
+      "R": "オール肺感染",
+      "E": "オール腸炎"
+    },
+    "yaku_nature": "オール熱帯"
   }
 ]
