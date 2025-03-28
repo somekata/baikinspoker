@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>バイキンズカードゲーム</title>
+    <link rel="stylesheet" href="style/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>バイキンズカードゲーム</h1>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="play">PLAY</button>
+      <button class="tab-btn" data-tab="stat">STAT</button>
+      <button class="tab-btn" data-tab="info">INFO</button>
+      <button class="tab-btn" data-tab="misc">MISC</button>
+    </nav>
+
+    <main>
+      <!-- PLAY タブ -->
+      <section id="tab-play" class="tab-content active">
+        <section id="cpu-area">
+          <h2>コンピューターの手札</h2>
+          <div id="cpu-hand"></div>
+        </section>
+
+        <section id="game-area">
+          <h2>あなたの手札</h2>
+          <div id="player-hand"></div>
+        </section>
+
+        <section id="status-area">
+          <p>あなたの役：<span id="current-yaku">---</span></p>
+          <p>あなたの得点：<span id="score">0</span></p>
+          <p>コンピューターの役：<span id="cpu-yaku">---</span></p>
+          <p>コンピューターの得点：<span id="cpu-score">0</span></p>
+        </section>
+
+        <div id="controls">
+          <button id="start-btn">ゲーム開始</button>
+          <button id="next-btn" disabled>次へ</button>
+          <button id="finish-btn" disabled>結果を見る</button>
+        </div>
+
+        <section id="result-area">
+          <h2 id="winner-message"></h2>
+        </section>
+      </section>
+
+      <!-- STAT タブ -->
+      <section id="tab-stat" class="tab-content">
+        <h2>プレイ履歴</h2>
+        <div id="history-log">
+          <p>まだ履歴はありません。</p>
+        </div>
+      </section>
+
+      <!-- INFO タブ -->
+      <section id="tab-info" class="tab-content">
+        <h2>操作方法とバージョン情報</h2>
+        <p>
+          カードをクリックして選択し、「次へ」で交換を交互に行います。山札が尽きるか、役が揃った時点で「結果を見る」で勝敗を確認します。
+        </p>
+        <p>バージョン：v1.0</p>
+      </section>
+
+      <!-- MISC タブ -->
+      <section id="tab-misc" class="tab-content">
+        <h2>リンク</h2>
+        <ul>
+          <li><a href="#" target="_blank">公式サイト</a></li>
+          <li><a href="#" target="_blank">バイキンズとは？</a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Kaneko Lab</p>
+    </footer>
+
+    <script type="module" src="script/main.js"></script>
+    <script>
+      // タブ切り替え用スクリプト
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab-btn")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-content")
+            .forEach((c) => c.classList.remove("active"));
+
+          btn.classList.add("active");
+          const target = btn.getAttribute("data-tab");
+          document.getElementById("tab-" + target).classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>

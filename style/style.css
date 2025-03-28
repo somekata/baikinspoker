@@ -1,0 +1,170 @@
+/* style.css - game-like & boyish theme */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0e0e1a;
+    color: #e0e0e0;
+  }
+  
+  header, footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #1c1c2e;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  
+  h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: #00ffe7;
+    text-shadow: 0 0 5px #00ffe7;
+  }
+  
+  .tabs {
+    display: flex;
+    justify-content: space-around;
+    background-color: #222;
+    border-bottom: 3px solid #333;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 1rem;
+    background: #111;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #00ffe7;
+    border-bottom: 3px solid transparent;
+  }
+  
+  .tab-btn.active {
+    background-color: #1e1e2f;
+    font-weight: bold;
+    border-bottom: 3px solid #00ffe7;
+  }
+  
+  main {
+    padding: 1rem;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+  
+  #cpu-hand, #player-hand {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+  }
+  
+  .card {
+    width: 90px;
+    background-color: #222;
+    border: 2px solid #00bcd4;
+    border-radius: 8px;
+    padding: 0.3rem;
+    box-shadow: 0 0 8px rgba(0,255,255,0.2);
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+    border-color: #00ffe7;
+  }
+  
+  .card img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+  
+  .card.selected {
+    border: 2px solid #00ffe7;
+    box-shadow: 0 0 12px #00ffe7;
+    background-color: #121220;
+  }
+  
+  #status-area, #result-area {
+    text-align: center;
+    margin: 1rem 0;
+    font-size: 1.1rem;
+  }
+  
+  #controls {
+    text-align: center;
+    margin: 1rem 0;
+  }
+  
+  button {
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+    margin: 0.5rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #00bcd4;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+  }
+  
+  button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+  }
+  
+  button:hover:not(:disabled) {
+    background-color: #00ffe7;
+    color: #000;
+    transform: scale(1.05);
+  }
+  
+  #history-log table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    background-color: #1c1c2c;
+  }
+  
+  #history-log th, #history-log td {
+    border: 1px solid #333;
+    padding: 0.5rem;
+    text-align: center;
+    color: #e0e0e0;
+  }
+  
+  #history-log th {
+    background-color: #2c2c3c;
+    color: #00ffe7;
+  }
+  
+  @media (max-width: 600px) {
+    .card {
+      width: 70px;
+    }
+  
+    .tab-btn {
+      font-size: 0.85rem;
+      padding: 0.5rem;
+    }
+  
+    button {
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+    }
+  
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+  
