@@ -226,6 +226,28 @@ async function loadCharaTable() {
   charaData.forEach(ch => {
     const tr = document.createElement("tr");
 
+    // ✅ 画像列を追加！
+    const imgTd = document.createElement("td");
+    const link = document.createElement("a");
+
+    // キャラIDを2桁ゼロ埋めで取得（例: 4 → 04）
+    const charaId = ch.id.toString().padStart(2, "0");
+    link.href = `https://www.omu.ac.jp/med/bacteriology/online/image/card/img-card-${charaId}.png`;
+    link.target = "_blank";
+
+    const img = document.createElement("img");
+    img.src = `img/sm-card-${charaId}.png`;
+    img.alt = ch.name;
+    img.style.width = "50px";
+    img.style.height = "auto";
+    img.style.borderRadius = "0.5rem";
+
+    link.appendChild(img);
+    imgTd.appendChild(link);
+
+    imgTd.style.border = "1px solid #333";
+    imgTd.style.padding = "0.5rem";
+
     const nameTd = document.createElement("td");
     const name = ch.name || "";
     const sci = ch.scientificNameEn || "";
@@ -257,6 +279,7 @@ async function loadCharaTable() {
     yakuTd.style.border = "1px solid #333";
     yakuTd.style.padding = "0.5rem";
 
+    tr.appendChild(imgTd);
     tr.appendChild(nameTd);
     tr.appendChild(typeTd);
     tr.appendChild(yakuTd);
