@@ -96,7 +96,7 @@
     "scientificNameJa": "レジオネラ",
     "scientificNameEnRubi": "レジオネラ・ニューモフィラ",
     "scientificNameEn": "<em>Legionella pneumophila<\/em>",
-    "type": "グラム陰性桿菌",
+    "type": ["グラム陰性桿菌", "非定型菌"],
     "bacterialFeatures": ["淡水環境に生息し、好気性。", "BCYE（Buffered Charcoal Yeast Extract）-α）培地、WYO培地などの特殊な培地が必要"],
     "clinicalFeatures": ["レジオネラ肺炎（在郷軍人病）の原因菌。", "検体中の菌はグラム染色で染まらないため、<ruby>Gimenez<rt>ヒネメス<\/rt><\/ruby>染色を用いる。ただし、いったん培養するとグラム陰性に染まる。"],
     "additionalInfo": ["エアロゾル感染による集団発生が知られる。", "重症化しやすい。ステロイド内服など、細胞性免疫が低下した宿主では注意が必要。", "比較的徐脈や低Na血症等も起こりやすい。"],
