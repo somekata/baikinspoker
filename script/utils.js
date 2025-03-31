@@ -12,8 +12,11 @@ export function padZero(num, length = 2) {
   
   // スコア合計を計算（役リストを受け取る）
   export function calcTotalScore(yakus) {
-    return yakus.reduce((sum, y) => sum + y.score, 0);
+    const total = yakus.reduce((sum, y) => sum + Number(y.score), 0);
+    console.log("🧮 スコア計算詳細:", yakus.map(y => `${y.name} (${y.score})`).join(", "), `=> 合計: ${total}`);
+    return total;
   }
+  
   
   // 役の名前だけを並べて表示用にする
   export function formatYakus(yakus) {

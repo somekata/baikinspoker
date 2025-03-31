@@ -92,6 +92,8 @@ function exchangeTurn() {
 }
 
 function showResult() {
+  const playerYakus = getYakus(playerHand, yakuData);
+  const cpuYakus = getYakus(cpuHand, yakuData);  
   const playerScore = calcTotalScore(getYakus(playerHand, yakuData));
   const cpuScore = calcTotalScore(getYakus(cpuHand, yakuData));
   const winner = playerScore > cpuScore ? "あなたの勝ち！"
@@ -104,24 +106,52 @@ function showResult() {
     date: new Date().toLocaleString(),
     playerScore,
     cpuScore,
+    playerYakus: formatYakus(playerYakus),
+    cpuYakus: formatYakus(cpuYakus),    
     result: winner
   };
   historyLog.push(entry);
   updateHistoryLog();
+
+  document.getElementById("winner-message").textContent = winner;
 }
 
 function updateHistoryLog() {
+  const summary = document.getElementById("history-summary");
+  summary.innerHTML = "";
   const log = document.getElementById("history-log");
   log.innerHTML = "";
   if (historyLog.length === 0) {
     log.innerHTML = "<p>まだ履歴はありません。</p>";
     return;
   }
+
+    // 🧮 勝敗＆スコア集計
+    let win = 0, lose = 0, draw = 0;
+    let totalPlayer = 0, totalCPU = 0;
+
+    historyLog.forEach(entry => {
+      totalPlayer += entry.playerScore;
+      totalCPU += entry.cpuScore;
+      if (entry.result.includes("あなたの勝ち")) win++;
+      else if (entry.result.includes("コンピューターの勝ち")) lose++;
+      else draw++;
+    });
+  
+    summary.innerHTML = `
+      <p>🏆 勝敗: ${win}勝 ${lose}敗（引き分け ${draw}）</p>
+      <p>🎯 スコア合計: あなた ${totalPlayer}点 : コンピューター ${totalCPU}点</p>
+    `;
+    
   const table = document.createElement("table");
   table.innerHTML = "<tr><th>日時</th><th>あなた</th><th>コンピューター</th><th>結果</th></tr>";
   historyLog.slice().reverse().forEach(entry => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${entry.date}</td><td>${entry.playerScore}</td><td>${entry.cpuScore}</td><td>${entry.result}</td>`;
+    row.innerHTML = `
+    <td>${entry.date}</td>
+    <td>${entry.playerScore}<br><small>${entry.playerYakus}</small></td>
+    <td>${entry.cpuScore}<br><small>${entry.cpuYakus}</small></td>
+    <td>${entry.result}</td>`;
     table.appendChild(row);
   });
   log.appendChild(table);

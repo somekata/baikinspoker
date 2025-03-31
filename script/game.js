@@ -10,26 +10,30 @@ export function getRandomHand(deck, count = 5) {
   export function getYakus(hand, yakuData) {
     const results = [];
   
-    // 汎用カテゴリチェック関数
-    const checkCategory = (category) => {
-      const yakuList = yakuData.filter(y => y.category === category);
-  
-      yakuList.forEach(yaku => {
-        const keyword = yaku.yaku_name.replace("オール", "").replace(/炎$/, "");
-        const ok = hand.every(card => {
-          const value = card[category];
-          if (!value) return false;
-  
-          if (Array.isArray(value)) {
-            return value.includes(keyword);
-          } else {
-            return value.includes(keyword);
-          }
-        });
-  
-        if (ok) results.push({ name: yaku.yaku_name, score: yaku.score });
-      });
-    };
+// 汎用カテゴリチェック関数
+const checkCategory = (category) => {
+  const yakuList = yakuData.filter(y => y.category === category);
+
+  yakuList.forEach(yaku => {
+    const keyword = yaku.yaku_name.replace(/^オール/, "").trim();
+
+    const ok = hand.every(card => {
+      let value = card[category];
+      if (!value) return false;
+
+      // どんな型でも配列化してから判定
+      const values = Array.isArray(value) ? value : [value];
+      return values.includes(keyword);
+    });
+
+    if (ok) {
+      console.log(`✅ 成立: ${yaku.yaku_name}（category: ${category}, keyword: ${keyword}）`);
+      results.push({ name: yaku.yaku_name, score: Number(yaku.score) });
+    } else {
+      console.log(`❌ 不成立: ${yaku.yaku_name}`);
+    }
+  });
+};
   
     checkCategory("type");
     checkCategory("nature");
@@ -47,14 +51,7 @@ areaYakus.forEach(yaku => {
   });
   if (ok) results.push({ name: yaku.yaku_name, score: yaku.score });
 });
-  
-    // 特殊役：ロイヤルファミリーズ
-    const ids = hand.map(c => c.id);
-    const isRoyalFamily = ids.every(id => [1, 2, 3, 4, 5].includes(id));
-    if (isRoyalFamily) {
-      results.push({ name: "ロイヤルファミリーズ", score: 30 });
-    }
-  
+console.log("🃏 成立役リスト:", results.map(r => r.name));
     return results;
   }
   
