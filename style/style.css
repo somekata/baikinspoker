@@ -148,6 +148,24 @@ body {
     color: #00ffe7;
   }
   
+  /* MISCタブのリンクセクション用スタイル */
+#tab-misc ul {
+  list-style-type: square;
+  padding-left: 1.5rem;
+  color: #e0e0e0;
+}
+
+#tab-misc a {
+  color: #00ffe7;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#tab-misc a:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
   @media (max-width: 600px) {
     .card {
       width: 40px;
