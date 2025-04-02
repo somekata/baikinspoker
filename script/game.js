@@ -23,7 +23,7 @@ const checkCategory = (category) => {
 
       // どんな型でも配列化してから判定
       const values = Array.isArray(value) ? value : [value];
-      return values.includes(keyword);
+      return values.some(v => v.includes(keyword));
     });
 
     if (ok) {
