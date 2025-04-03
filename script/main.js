@@ -94,29 +94,30 @@ function exchangeTurn() {
 function showResult() {
   const playerYakus = getYakus(playerHand, yakuData);
   const cpuYakus = getYakus(cpuHand, yakuData);  
-  const playerScore = calcTotalScore(getYakus(playerHand, yakuData));
-  const cpuScore = calcTotalScore(getYakus(cpuHand, yakuData));
+  const playerScore = calcTotalScore(playerYakus);
+  const cpuScore = calcTotalScore(cpuYakus);
   const winner = playerScore > cpuScore ? "あなたの勝ち！"
     : playerScore < cpuScore ? "コンピューターの勝ち！"
     : "引き分け！";
   document.getElementById("winner-message").textContent = winner;
 
-  // 履歴保存
   const entry = {
     date: new Date().toLocaleString(),
     playerScore,
     cpuScore,
     playerYakus: formatYakus(playerYakus),
     cpuYakus: formatYakus(cpuYakus),    
-    result: winner
+    result: winner,
+    playerHand: playerHand.map(card => card.id),
+    cpuHand: cpuHand.map(card => card.id)
   };
   historyLog.push(entry);
   updateHistoryLog();
-
-  document.getElementById("winner-message").textContent = winner;
 }
 
 function updateHistoryLog() {
+  console.log("📝 updateHistoryLog が呼び出されました");
+
   const summary = document.getElementById("history-summary");
   summary.innerHTML = "";
   const log = document.getElementById("history-log");
@@ -126,34 +127,59 @@ function updateHistoryLog() {
     return;
   }
 
-    // 🧮 勝敗＆スコア集計
-    let win = 0, lose = 0, draw = 0;
-    let totalPlayer = 0, totalCPU = 0;
+  let win = 0, lose = 0, draw = 0;
+  let totalPlayer = 0, totalCPU = 0;
 
-    historyLog.forEach(entry => {
-      totalPlayer += entry.playerScore;
-      totalCPU += entry.cpuScore;
-      if (entry.result.includes("あなたの勝ち")) win++;
-      else if (entry.result.includes("コンピューターの勝ち")) lose++;
-      else draw++;
-    });
-  
-    summary.innerHTML = `
-      <p>🏆 勝敗: ${win}勝 ${lose}敗（引き分け ${draw}）</p>
-      <p>🎯 スコア合計: あなた ${totalPlayer}点 : コンピューター ${totalCPU}点</p>
-    `;
-    
+  historyLog.forEach(entry => {
+    totalPlayer += entry.playerScore;
+    totalCPU += entry.cpuScore;
+    if (entry.result.includes("あなたの勝ち")) win++;
+    else if (entry.result.includes("コンピューターの勝ち")) lose++;
+    else draw++;
+  });
+
+  summary.innerHTML = `
+    <p>🏆 勝敗: ${win}勝 ${lose}敗（引き分け ${draw}）</p>
+    <p>🎯 スコア合計: あなた ${totalPlayer}点 : コンピューター ${totalCPU}点</p>
+  `;
+
   const table = document.createElement("table");
-  table.innerHTML = "<tr><th>日時</th><th>あなた</th><th>コンピューター</th><th>結果</th></tr>";
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+
+  thead.innerHTML = "<tr><th>日時</th><th>あなた</th><th>コンピューター</th><th>結果</th></tr>";
+  table.appendChild(thead);
+  table.appendChild(tbody);
+
   historyLog.slice().reverse().forEach(entry => {
+    const playerCardImages = entry.playerHand.map(id => {
+      const padded = String(id).padStart(2, "0");
+      return `<img src="img/sm-card-${padded}.png" alt="card" style="height:40px; margin-right:2px; border-radius:3px;">`;
+    }).join("");
+
+    const cpuCardImages = entry.cpuHand.map(id => {
+      const padded = String(id).padStart(2, "0");
+      return `<img src="img/sm-card-${padded}.png" alt="card" style="height:40px; margin-right:2px; border-radius:3px;">`;
+    }).join("");
+
     const row = document.createElement("tr");
     row.innerHTML = `
-    <td>${entry.date}</td>
-    <td>${entry.playerScore}<br><small>${entry.playerYakus}</small></td>
-    <td>${entry.cpuScore}<br><small>${entry.cpuYakus}</small></td>
-    <td>${entry.result}</td>`;
-    table.appendChild(row);
+      <td>${entry.date}</td>
+      <td>
+        ${entry.playerScore}<br>
+        <small>${entry.playerYakus}</small><br>
+        <div>${playerCardImages}</div>
+      </td>
+      <td>
+        ${entry.cpuScore}<br>
+        <small>${entry.cpuYakus}</small><br>
+        <div>${cpuCardImages}</div>
+      </td>
+      <td>${entry.result}</td>
+    `;
+    tbody.appendChild(row);
   });
+
   log.appendChild(table);
 }
 
@@ -213,9 +239,6 @@ async function loadYakuTable() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadYakuTable(); // ← INFO用役テーブル表示
-});
 async function loadCharaTable() {
   const baseURL = "https://somekata.github.io/baikinspoker/";
   const res = await fetch(`${baseURL}data/chara.json`);
@@ -226,11 +249,9 @@ async function loadCharaTable() {
   charaData.forEach(ch => {
     const tr = document.createElement("tr");
 
-    // ✅ 画像列を追加！
     const imgTd = document.createElement("td");
     const link = document.createElement("a");
 
-    // キャラIDを2桁ゼロ埋めで取得（例: 4 → 04）
     const charaId = ch.id.toString().padStart(2, "0");
     link.href = `https://www.omu.ac.jp/med/bacteriology/online/image/card/img-card-${charaId}.png`;
     link.target = "_blank";
@@ -240,7 +261,7 @@ async function loadCharaTable() {
     img.alt = ch.name;
     img.style.width = "50px";
     img.style.height = "auto";
-    img.style.borderRadius = "0.5rem";
+    img.style.borderRadius = "0.2rem";
 
     link.appendChild(img);
     imgTd.appendChild(link);
@@ -287,7 +308,7 @@ async function loadCharaTable() {
   });
 }
 
-// 既存のloadYakuTableと同じように呼び出す
 document.addEventListener("DOMContentLoaded", () => {
+  loadYakuTable();
   loadCharaTable();
 });
