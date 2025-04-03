@@ -481,9 +481,10 @@
     "taxonomy.class": "<em>Actinomycetes<\/em>",
     "taxonomy.order": "<em>Mycobacteriales<\/em>",
     "taxonomy.family": "<em>Mycobacteriaceae<\/em>",
-    "area": ["R", "E"],
+    "area": ["N", "R", "E"],
     "nature": "宮殿",
     "yaku_area": {
+      "N": "オール髄膜炎",
       "R": "オール肺感染",
       "E": "オール腸炎"
     },
