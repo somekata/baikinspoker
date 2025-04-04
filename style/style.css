@@ -75,7 +75,7 @@ p {
     background-color: #222;
     border: 2px solid #00bcd4;
     border-radius: 8px;
-    padding: 0.3rem;
+    padding: 0.1rem;
     box-shadow: 0 0 8px rgba(0,255,255,0.2);
     cursor: pointer;
     transition: transform 0.2s, border-color 0.2s;
@@ -187,7 +187,7 @@ p {
     }
     
     .card:hover {
-      transform: scale(4);
+      transform: scale(3);
     }
     
     .tab-btn {
