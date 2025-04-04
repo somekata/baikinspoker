@@ -185,7 +185,11 @@ p {
     .card {
       width: 40px;
     }
-  
+    
+    .card:hover {
+      transform: scale(4);
+    }
+    
     .tab-btn {
       font-size: 0.85rem;
       padding: 0.5rem;
