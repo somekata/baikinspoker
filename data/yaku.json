@@ -3,25 +3,25 @@
     "yaku_name": "オール陽性",
     "category": "type",
     "description": "すべて陽性菌で構成されている",
-    "score": 5000
+    "score": 2000
   },
   {
     "yaku_name": "オール陰性",
     "category": "type",
     "description": "すべて陰性菌で構成されている",
-    "score": 140
+    "score": 100
   },
   {
     "yaku_name": "オール真菌",
     "category": "type",
     "description": "すべて真菌で構成されている",
-    "score": 70
+    "score": 50
   },
   {
     "yaku_name": "オール髄膜炎",
     "category": "area",
     "description": "全員がN（神経系）を持つ",
-    "score": 300
+    "score": 200
   },
   {
     "yaku_name": "オール肺感染",
@@ -33,36 +33,36 @@
     "yaku_name": "オール腸炎",
     "category": "area",
     "description": "全員がE（消化器系）を持つ",
-    "score": 40
+    "score": 30
   },
   {
     "yaku_name": "オールUTI",
     "category": "area",
     "description": "全員がU（泌尿器系）を持つ",
-    "score": 5000
+    "score": 2000
   },
   {
     "yaku_name": "オール水系",
     "category": "nature",
     "description": "全員が『水』に関連",
-    "score": 600
+    "score": 500
   },
   {
     "yaku_name": "オール熱帯",
     "category": "nature",
     "description": "全員が『熱帯』に関連",
-    "score": 5000
+    "score": 2000
   },
   {
     "yaku_name": "オール野外",
     "category": "nature",
     "description": "全員が『野外』に関連",
-    "score": 1500
+    "score": 1000
   },
   {
     "yaku_name": "オール宮殿",
     "category": "nature",
     "description": "全員が『宮殿』に関連",
-    "score": 140
+    "score": 100
   }
 ]
