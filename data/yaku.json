@@ -21,7 +21,7 @@
     "yaku_name": "オール髄膜炎",
     "category": "area",
     "description": "全員がN（神経系）を持つ",
-    "score": 300
+    "score": 100
   },
   {
     "yaku_name": "オール肺感染",
@@ -51,7 +51,7 @@
     "yaku_name": "オール熱帯",
     "category": "nature",
     "description": "全員が『熱帯』に関連",
-    "score": 50
+    "score": 100
   },
   {
     "yaku_name": "オール野外",
