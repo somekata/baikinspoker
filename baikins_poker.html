@@ -72,6 +72,98 @@ h1 small{
 }
 .reset-btn:active{transform:translateY(1px);}
 
+/* ---------- tabs ---------- */
+.tabs{
+  display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;
+}
+.tab-btn{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700; font-size:12.5px;
+  background:var(--panel); border:1.5px solid var(--line); color:#566154;
+  padding:8px 14px; border-radius:999px; cursor:pointer;
+}
+.tab-btn.active{background:var(--felt-deep); color:#F4EFD9; border-color:var(--felt-deep);}
+
+/* ---------- explain / yaku / links tab content ---------- */
+.doc-section{
+  background:var(--panel); border-radius:16px; padding:16px 18px; margin-bottom:12px;
+  box-shadow:var(--shadow); border:1.5px solid var(--line);
+}
+.doc-section h2{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-size:15px; margin:0 0 10px;
+  color:var(--felt-deep); display:flex; align-items:center; gap:6px;
+}
+.doc-section p, .doc-section li{font-size:13px; line-height:1.8; color:#3a443c;}
+.doc-section ul{margin:6px 0; padding-left:20px;}
+.flow-strip{
+  display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap;
+  margin:10px 0 14px;
+}
+.flow-step{
+  background:var(--agar-deep); border:1.5px solid var(--line); border-radius:12px;
+  padding:8px 12px; font-size:12px; font-weight:700; text-align:center;
+  font-family:'M PLUS Rounded 1c',sans-serif; color:var(--felt-deep); min-width:80px;
+}
+.flow-arrow{font-size:16px; color:var(--gold); font-weight:800;}
+.threshold-table{width:100%; border-collapse:collapse; margin:8px 0 4px; font-size:12.5px;}
+.threshold-table th, .threshold-table td{
+  border:1px solid var(--line); padding:7px 8px; text-align:center;
+}
+.threshold-table th{background:var(--agar-deep); font-family:'M PLUS Rounded 1c',sans-serif; color:var(--felt-deep);}
+.seat-ring-wrap{display:flex; justify-content:center; margin:8px 0 14px;}
+.glossary-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; margin-top:8px;}
+.glossary-item{
+  background:var(--agar-deep); border-radius:12px; padding:9px 11px; border:1px solid var(--line);
+}
+.glossary-item b{
+  display:block; font-family:'M PLUS Rounded 1c',sans-serif; color:var(--gold); font-size:12.5px; margin-bottom:3px;
+}
+.glossary-item span{font-size:11.5px; color:#4d5b4d; line-height:1.5;}
+
+.yaku-showcase{display:flex; flex-direction:column; gap:10px;}
+.yaku-row{
+  display:flex; align-items:center; gap:10px; background:var(--panel);
+  border:1.5px solid var(--line); border-radius:14px; padding:8px 10px;
+  box-shadow:var(--shadow); flex-wrap:wrap;
+}
+.yaku-row .ylabel{
+  flex:0 0 auto; min-width:108px;
+  font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700; font-size:12.5px; color:var(--felt-deep);
+}
+.yaku-row .ypts{
+  font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold); font-size:13px; margin-left:2px;
+}
+.yaku-row .ycards{display:flex; gap:4px; flex-wrap:wrap; flex:1 1 auto;}
+
+.xref-wrap{overflow-x:auto; margin-top:8px;}
+.xref-table{border-collapse:collapse; font-size:10.5px; white-space:nowrap;}
+.xref-table th, .xref-table td{border:1px solid var(--line); padding:4px 6px; text-align:center;}
+.xref-table th{background:var(--agar-deep); font-family:'M PLUS Rounded 1c',sans-serif; color:var(--felt-deep);}
+.xref-table td.cardname{
+  text-align:left; font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700; color:var(--ink);
+  position:sticky; left:0; background:var(--panel);
+}
+.xref-table td.yes{color:var(--gold); font-weight:800;}
+.xref-table td.cls{font-size:9.5px; color:#7C8A78;}
+
+.link-grid{display:flex; flex-direction:column; gap:10px;}
+.link-card{
+  background:var(--panel); border:1.5px solid var(--line); border-radius:16px;
+  padding:14px 16px; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; gap:6px;
+}
+.link-card .lname{font-family:'M PLUS Rounded 1c',sans-serif; font-weight:800; font-size:15px; color:var(--felt-deep);}
+.link-card .ldesc{font-size:12.5px; color:#4d5b4d; line-height:1.6;}
+.link-card .lcat{
+  align-self:flex-start; font-size:10px; font-weight:700; color:var(--gold);
+  background:var(--agar-deep); padding:2px 9px; border-radius:999px;
+}
+.link-card .lopen{
+  align-self:flex-start; margin-top:4px;
+  font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700; font-size:12px;
+  background:var(--felt-deep); color:#F4EFD9; padding:7px 16px; border-radius:999px;
+  text-decoration:none;
+}
+
 /* ---------- scoreboard ---------- */
 .scoreboard{
   display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
@@ -269,6 +361,43 @@ footer.disclaimer{
   .mcard{width:54px; min-height:76px;}
   .mcard .nm{font-size:7.5px;}
 }
+/* ---------- popup overlay ---------- */
+.popup-overlay{
+  position:fixed; inset:0; z-index:60;
+  background:rgba(28,52,45,.6);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  animation:popupFade .15s ease;
+}
+.popup-card{
+  background:var(--panel); border-radius:22px; padding:30px 40px;
+  text-align:center; max-width:92vw;
+  box-shadow:0 16px 40px rgba(0,0,0,.4);
+  border:3px solid var(--gold);
+  animation:popupPop .4s cubic-bezier(.34,1.56,.64,1);
+}
+.popup-card .ptitle{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-weight:800;
+  font-size:clamp(26px,7vw,40px); color:var(--felt-deep); margin-bottom:6px; line-height:1.2;
+}
+.popup-card .psub{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700;
+  font-size:clamp(16px,4.5vw,22px); color:#B8852B; margin-bottom:4px;
+}
+.popup-card .pdetail{
+  font-family:'JetBrains Mono',monospace; font-size:clamp(13px,3.6vw,16px); color:#566154; margin-top:4px;
+}
+.standings-list{margin-top:12px; display:inline-block; text-align:left;}
+.standings-list .srow{
+  display:flex; justify-content:space-between; gap:24px;
+  font-family:'JetBrains Mono',monospace; font-size:clamp(13px,3.8vw,16px);
+  padding:4px 2px; border-bottom:1px dashed var(--line);
+}
+.standings-list .srow:last-child{border-bottom:none;}
+.standings-list .srow .rk{font-weight:700; color:var(--gold); margin-right:8px;}
+@keyframes popupFade{from{opacity:0;} to{opacity:1;}}
+@keyframes popupPop{0%{transform:scale(.55); opacity:0;} 100%{transform:scale(1); opacity:1;}}
+
 </style>
 </head>
 <body>
@@ -278,6 +407,15 @@ footer.disclaimer{
     <h1>バイキンズポーカー<small>Baikins Poker &mdash; 1 vs 3 CPU</small></h1>
     <button class="reset-btn" onclick="App.newGame()">🔄 新しいゲーム</button>
   </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="play" onclick="App.setTab('play')">🎮 プレイ</button>
+    <button class="tab-btn" data-tab="explain" onclick="App.setTab('explain')">📖 解説</button>
+    <button class="tab-btn" data-tab="yaku" onclick="App.setTab('yaku')">🏆 役と点数</button>
+    <button class="tab-btn" data-tab="links" onclick="App.setTab('links')">🔗 リンク</button>
+  </nav>
+
+  <div id="tab-play" class="tab-pane">
 
   <div class="scoreboard" id="scoreboard"></div>
 
@@ -326,11 +464,19 @@ footer.disclaimer{
     </div>
   </div>
 
+  </div><!-- /tab-play -->
+
+  <div id="tab-explain" class="tab-pane" style="display:none;"></div>
+  <div id="tab-yaku" class="tab-pane" style="display:none;"></div>
+  <div id="tab-links" class="tab-pane" style="display:none;"></div>
+
   <footer class="disclaimer">
     本テキストは AI（Claude, Anthropic）を用いて作成されました。内容には誤りが含まれる可能性があります。医療上の判断には必ず公式の教科書・文献・専門家の指導を参照してください。<br>
     二次利用・再配布は自己責任のもとで可能です。その際、本注記の保持を推奨します。
   </footer>
 </div>
+
+<div id="popup-root"></div>
 
 <script>
 /* =========================================================
@@ -445,6 +591,169 @@ function lapThresholdLabel(lap){
   return t>0 ? `${lap}巡目（${t}点以上で上がり可）` : `${lap}巡目以降（役があれば上がり可）`;
 }
 
+/* ---------------- popup helpers ---------------- */
+function reachPopupHtml(name){
+  return `<div class="popup-overlay"><div class="popup-card">
+    <div class="ptitle">🚩 リーチ！</div>
+    <div class="psub">${name}</div>
+  </div></div>`;
+}
+function winPopupHtml(name, yakuLabel, pts){
+  return `<div class="popup-overlay"><div class="popup-card">
+    <div class="ptitle">🏆 あがり！</div>
+    <div class="psub">${name}</div>
+    <div class="pdetail">「${yakuLabel}」 ＋${pts}点</div>
+  </div></div>`;
+}
+function standingsPopupHtml(scores){
+  const order = [0,1,2,3].map(i=>({i, score:scores[i]})).sort((a,b)=>b.score-a.score);
+  const rows = order.map((o,rank)=>`<div class="srow"><span><span class="rk">${rank+1}位</span>${PLAYER_NAMES[o.i]}</span><span>${o.score}点</span></div>`).join('');
+  return `<div class="popup-overlay"><div class="popup-card">
+    <div class="ptitle">📊 現在の順位</div>
+    <div class="standings-list">${rows}</div>
+  </div></div>`;
+}
+
+/* ---------------- tab content builders ---------------- */
+function buildExplainHtml(){
+  return `
+  <div class="doc-section">
+    <h2>🎮 バイキンズポーカーとは</h2>
+    <p>32種類のバイキンズ（細菌・真菌）カードを使った、麻雀とポーカーを混ぜたようなゲームです。あなた1人 vs CPU3人で対戦し、手札5枚が同じ「役」の条件を満たしたら自己申告で「あがり」を宣言します。</p>
+  </div>
+
+  <div class="doc-section">
+    <h2>🃏 準備</h2>
+    <ul>
+      <li>32枚のバイキンズカードをシャッフルし、4人に5枚ずつ配ります</li>
+      <li>残りの12枚が山札になります</li>
+    </ul>
+  </div>
+
+  <div class="doc-section">
+    <h2>🔁 手番の流れ</h2>
+    <div class="flow-strip">
+      <div class="flow-step">① 引く<br><span style="font-weight:400;font-size:10px;">山から or 釣菌</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">② 1枚捨てる<br><span style="font-weight:400;font-size:10px;">6枚→5枚</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">③ 次の人へ</div>
+    </div>
+    <p><b>山から引く</b>：山札の一番上を引きます。</p>
+    <p><b>釣菌する</b>：直前の手番の人が捨てたカードを、山から引く代わりに取ります。<u>釣菌できるのは自分のひとつ前の人が捨てた1枚だけ</u>です。1人飛ばして取ったり、2巡前のカードを取ったりはできません。</p>
+    <div class="seat-ring-wrap">
+      <svg viewBox="0 0 220 160" width="220" height="160">
+        <circle cx="110" cy="40" r="22" fill="#EDE7D2" stroke="#28473E" stroke-width="2"/>
+        <text x="110" y="44" text-anchor="middle" font-size="11" font-family="M PLUS Rounded 1c" fill="#23302A">CPU②</text>
+        <circle cx="30" cy="110" r="22" fill="#EDE7D2" stroke="#28473E" stroke-width="2"/>
+        <text x="30" y="114" text-anchor="middle" font-size="11" font-family="M PLUS Rounded 1c" fill="#23302A">CPU①</text>
+        <circle cx="190" cy="110" r="22" fill="#EDE7D2" stroke="#28473E" stroke-width="2"/>
+        <text x="190" y="114" text-anchor="middle" font-size="10" font-family="M PLUS Rounded 1c" fill="#23302A">CPU③</text>
+        <circle cx="110" cy="150" r="0" />
+        <rect x="80" y="138" width="60" height="22" rx="11" fill="#D9A441"/>
+        <text x="110" y="153" text-anchor="middle" font-size="11" font-family="M PLUS Rounded 1c" fill="#3a2a06">あなた</text>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#28473E"/></marker>
+        </defs>
+        <path d="M120,55 Q160,80 180,90" fill="none" stroke="#28473E" stroke-width="2" marker-end="url(#arrow)"/>
+        <path d="M188,132 Q160,150 142,149" fill="none" stroke="#28473E" stroke-width="2" marker-end="url(#arrow)"/>
+        <path d="M80,149 Q50,150 32,132" fill="none" stroke="#28473E" stroke-width="2" marker-end="url(#arrow)"/>
+        <path d="M30,88 Q50,60 88,48" fill="none" stroke="#28473E" stroke-width="2" marker-end="url(#arrow)"/>
+      </svg>
+    </div>
+    <p style="text-align:center; font-size:11.5px; color:#7C8A78; margin-top:-8px;">手番は あなた→CPU①→CPU②→CPU③→あなた…の順。矢印の向きが「釣菌できる相手」です。</p>
+  </div>
+
+  <div class="doc-section">
+    <h2>🏆 あがり方（自己申告）</h2>
+    <p>手札5枚すべてが、ある役の条件（同じ分類・同じ感染部位など）を満たしたら「あがり宣言」ボタンを押します。役の判定はシステムが行いますが、宣言するタイミングは自分の判断（自己申告）です。</p>
+    <p>ただし、巡目（自分が何回目の手番に入っているか）によって、あがるために必要な最低点数が変わります。</p>
+    <table class="threshold-table">
+      <tr><th>巡目</th><th>必要点数</th></tr>
+      <tr><td>1巡目</td><td>50点以上</td></tr>
+      <tr><td>2巡目</td><td>30点以上</td></tr>
+      <tr><td>3巡目</td><td>20点以上</td></tr>
+      <tr><td>4巡目以降</td><td>役があればOK</td></tr>
+    </table>
+  </div>
+
+  <div class="doc-section">
+    <h2>🚩 リーチについて</h2>
+    <ul>
+      <li>手札5枚が「あと1枚で役完成」（テンパイ）の状態になったら、「リーチ宣言」ができます</li>
+      <li><b>リーチしていないと、たとえ役が完成しても上がれません</b>（最初の配牌でいきなり役が揃っていた場合だけは例外であがれます）</li>
+      <li>一度リーチすると、その後は手札を自由に選べなくなります。引いた札が待っている役と合えば自動でいらない方を捨てて判定、合わなければ引いた札をそのまま自動で捨てます。<b>リーチを途中で崩すことはできません</b></li>
+    </ul>
+  </div>
+
+  <div class="doc-section">
+    <h2>🔄 山札がなくなりそうなとき</h2>
+    <p>山札の残りが1枚になると、それまでに誰にも釣菌されなかった捨て札をすべてシャッフルし、残り1枚の下に補充します。補充分も引き尽くされ、捨て札も無くなった場合は<b>流局</b>（引き分け）として、そのラウンドは終了します。</p>
+  </div>
+
+  <div class="doc-section">
+    <h2>📚 用語ミニ辞典</h2>
+    <div class="glossary-grid">
+      <div class="glossary-item"><b>釣菌</b><span>前の人が捨てたカードを山引きの代わりに取ること</span></div>
+      <div class="glossary-item"><b>リーチ</b><span>あと1枚で役完成の状態で宣言する、あがりの予告</span></div>
+      <div class="glossary-item"><b>巡目</b><span>自分が何回目の手番に入っているかの回数</span></div>
+      <div class="glossary-item"><b>流局</b><span>山札（と捨て札）が尽きて誰も上がれずラウンド終了</span></div>
+      <div class="glossary-item"><b>自己申告</b><span>役が完成したかどうかを自分で判断して宣言する方式</span></div>
+      <div class="glossary-item"><b>テンパイ</b><span>手札があと1枚で役完成という状態</span></div>
+    </div>
+  </div>`;
+}
+
+function buildYakuHtml(){
+  const sorted = YAKU.slice().sort((a,b)=>b.pts-a.pts);
+  const rows = sorted.map(y=>{
+    const examples = CARDS.filter(c=>c.tags.includes(y.key)).slice(0,5);
+    const cardsHtml = examples.map(c=>cardHtml(c,{small:true})).join('');
+    return `<div class="yaku-row">
+      <div class="ylabel">${y.label}<br><span class="ypts">${y.pts}点</span></div>
+      <div class="ycards">${cardsHtml}</div>
+    </div>`;
+  }).join('');
+
+  const xrefHeader = `<tr><th>カード</th><th>分類</th>${sorted.map(y=>`<th>${y.label.replace('オール','')}</th>`).join('')}</tr>`;
+  const xrefRows = CARDS.map(c=>{
+    const cells = sorted.map(y=> c.tags.includes(y.key)? `<td class="yes">●</td>` : `<td></td>`).join('');
+    return `<tr><td class="cardname">${c.name}</td><td class="cls">${c.classification}</td>${cells}</tr>`;
+  }).join('');
+
+  return `
+  <div class="doc-section">
+    <h2>🏆 役と点数</h2>
+    <p>手札5枚すべてが同じタグを持っていれば、その役が成立します。点数が高いほど、早い巡目（1〜3巡目）でもあがりやすくなります。各役の例として、該当するキャラクターを最大5体表示しています。</p>
+    <div class="yaku-showcase">${rows}</div>
+  </div>
+
+  <div class="doc-section">
+    <h2>📋 32キャラクター × 役 対応表</h2>
+    <p>横にスクロールできます。●が付いている役に、そのキャラクターが含まれます。</p>
+    <div class="xref-wrap">
+      <table class="xref-table">${xrefHeader}${xrefRows}</table>
+    </div>
+  </div>`;
+}
+
+function buildLinksHtml(){
+  const links = [
+    {name:'細菌学教室', desc:'大阪公立大学医学部 細菌学教室公式サイト。', cat:'ホームページ', url:'https://www.omu.ac.jp/med/bacteriology/'},
+    {name:'ILOHA', desc:'Infection Lecture at OMU Hospital & Affiliates。事前学習・用語集ほか。', cat:'ホームページ', url:'https://www.omu.ac.jp/med/iloha/'},
+    {name:'Fil-GAP', desc:'抗菌薬適正使用研修会（Fil-GAP）公式ページ。', cat:'ホームページ', url:'http://filgap.kenkyuukai.jp/special/index.asp?id=41772'},
+    {name:'染方史郎の細菌楽教室', desc:'試験的に作成したページなのでコンテンツはあまり充実していませんが、お立ち寄りください。', cat:'ホームページ', url:'https://somekata.github.io/somekata/'},
+  ];
+  const cards = links.map(l=>`
+    <div class="link-card">
+      <span class="lcat">${l.cat}</span>
+      <div class="lname">${l.name}</div>
+      <div class="ldesc">${l.desc}</div>
+      <a class="lopen" href="${l.url}" target="_blank" rel="noopener">開く ↗</a>
+    </div>`).join('');
+  return `<div class="doc-section"><h2>🔗 関連リンク</h2><div class="link-grid">${cards}</div></div>`;
+}
+
 /* ---------------- game state ---------------- */
 const App = {
   scores:[0,0,0,0],
@@ -457,9 +766,35 @@ const App = {
   deadPile:[],            // 誰にも取られなかった捨て札（山が1枚になったら補充に使う）
   reached:[false,false,false,false],   // リーチ済みか
   reachTarget:[null,null,null,null],   // リーチ時に固定した狙いの役キー
+  popup:null,             // 現在表示中のポップアップHTML（null=非表示）
   phase:'idle',         // awaitAction | awaitDiscard | postDiscard | roundEnd
   log:[],
   roundOver:false,
+  activeTab:'play',
+  tabsBuilt:{explain:false, yaku:false, links:false},
+
+  setTab(tab){
+    this.activeTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.tab===tab);
+    });
+    ['play','explain','yaku','links'].forEach(t=>{
+      const el = document.getElementById('tab-'+t);
+      if(el) el.style.display = (t===tab? '' : 'none');
+    });
+    if(tab==='explain' && !this.tabsBuilt.explain){
+      document.getElementById('tab-explain').innerHTML = buildExplainHtml();
+      this.tabsBuilt.explain = true;
+    }
+    if(tab==='yaku' && !this.tabsBuilt.yaku){
+      document.getElementById('tab-yaku').innerHTML = buildYakuHtml();
+      this.tabsBuilt.yaku = true;
+    }
+    if(tab==='links' && !this.tabsBuilt.links){
+      document.getElementById('tab-links').innerHTML = buildLinksHtml();
+      this.tabsBuilt.links = true;
+    }
+  },
 
   newGame(){
     this.scores=[0,0,0,0];
@@ -477,6 +812,7 @@ const App = {
     this.deadPile = [];
     this.reached = [false,false,false,false];
     this.reachTarget = [null,null,null,null];
+    this.popup = null;
     this.turn = 0;
     this.turnsTaken = [1,0,0,0];
     this.phase = 'awaitAction';
@@ -575,8 +911,13 @@ const App = {
     this.reached[p] = true;
     this.reachTarget[p] = bt.key;
     this.pushLog(`🚩 ${PLAYER_NAMES[p]}がリーチ！（「${bt.label}」待ち）`);
-    if(p===0){ this.setMsg(`🚩 リーチしました！「${bt.label}」待ちです。次に揃ったら上がれます。`); }
+    this.popup = reachPopupHtml(PLAYER_NAMES[p]);
     this.render();
+    setTimeout(()=>{
+      this.popup = null;
+      if(p===0){ this.setMsg(`🚩 リーチしました！「${bt.label}」待ちです。次に揃ったら上がれます。`); }
+      this.render();
+    }, 1000);
   },
   declareWin(playerIdx){
     const hand = this.hands[playerIdx];
@@ -613,8 +954,17 @@ const App = {
     this.phase = 'roundEnd';
     const nm = PLAYER_NAMES[playerIdx];
     this.pushLog(`🏆 ${nm}が「${best.label}」で上がり！ +${best.pts}点（${lap}巡目）`);
-    this.setMsg(`<span class="win">🏆 ${nm}の上がり！「${best.label}」 +${best.pts}点</span>`);
+    this.popup = winPopupHtml(nm, best.label, best.pts);
     this.render();
+    setTimeout(()=>{
+      this.popup = standingsPopupHtml(this.scores);
+      this.render();
+      setTimeout(()=>{
+        this.popup = null;
+        this.setMsg(`<span class="win">🏆 ${nm}の上がり！「${best.label}」 +${best.pts}点</span>`);
+        this.render();
+      }, 1000);
+    }, 1000);
     return true;
   },
   endTurn(){
@@ -756,21 +1106,32 @@ const App = {
     this.render();
 
     setTimeout(()=>{
-      this.tryCpuReach(p);
-      const won = this.declareWin(p);
-      if(!won){
-        this.advanceTurn();
-      }
+      this.tryCpuReach(p, ()=>{
+        const won = this.declareWin(p);
+        if(!won){
+          this.advanceTurn();
+        }
+      });
     }, 550);
   },
-  tryCpuReach(p){
-    if(this.reached[p] || this.roundOver) return;
+  tryCpuReach(p, cb){
+    if(this.reached[p] || this.roundOver){ if(cb) cb(); return false; }
     const bt = bestTarget(this.hands[p]);
     if(bt.cnt===4){
       this.reached[p] = true;
       this.reachTarget[p] = bt.key;
       this.pushLog(`🚩 ${PLAYER_NAMES[p]}がリーチ！（「${bt.label}」待ち）`);
+      this.popup = reachPopupHtml(PLAYER_NAMES[p]);
       this.render();
+      setTimeout(()=>{
+        this.popup = null;
+        this.render();
+        if(cb) cb();
+      }, 1000);
+      return true;
+    } else {
+      if(cb) cb();
+      return false;
     }
   },
 
@@ -823,10 +1184,16 @@ const App = {
     // message
     document.getElementById('msg').innerHTML = this.msg || '';
 
+    // popup overlay (リーチ／あがり／順位)
+    document.getElementById('popup-root').innerHTML = this.popup || '';
+
     // buttons
     const br = document.getElementById('btn-row');
     let html = '';
-    if(this.roundOver){
+    if(this.popup){
+      // ポップアップ表示中は操作不可
+      html = '';
+    } else if(this.roundOver){
       html += `<button class="btn btn-gold" onclick="App.startRound()">▶ 次のラウンドへ</button>`;
     } else if(this.turn===0){
       if(this.phase==='awaitAction'){
