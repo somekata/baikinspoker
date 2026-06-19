@@ -395,6 +395,10 @@ footer.disclaimer{
 }
 .standings-list .srow:last-child{border-bottom:none;}
 .standings-list .srow .rk{font-weight:700; color:var(--gold); margin-right:8px;}
+.intro-desc{
+  font-size:13.5px; font-weight:500; color:#3a443c; line-height:1.8; text-align:left;
+  margin-top:10px;
+}
 @keyframes popupFade{from{opacity:0;} to{opacity:1;}}
 @keyframes popupPop{0%{transform:scale(.55); opacity:0;} 100%{transform:scale(1); opacity:1;}}
 
@@ -614,6 +618,17 @@ function slotPopupHtml(name, settled){
     <div class="psub" style="${settled? 'font-size:26px;' : 'opacity:.8;'}">${name}</div>
   </div></div>`;
 }
+function introPopupHtml(){
+  return `<div class="popup-overlay"><div class="popup-card" style="max-width:380px;">
+    <div class="ptitle" style="font-size:24px;">🦠 バイキンズポーカー</div>
+    <div class="intro-desc">
+      32種のバイキンズ（細菌・真菌）カードを使った、麻雀とポーカーを混ぜたようなゲームです。<br><br>
+      あなた1人 vs CPU3人。手札5枚で「役」を揃えて、自己申告で「あがり」を目指しましょう。<br><br>
+      くわしいルールは、ゲーム中いつでも上の「📖解説」タブから確認できます。
+    </div>
+    <button class="btn btn-gold" style="margin-top:16px; font-size:15px; padding:12px 30px;" onclick="App.beginGame()">▶ はじめる</button>
+  </div></div>`;
+}
 function standingsPopupHtml(scores){
   const order = [0,1,2,3].map(i=>({i, score:scores[i]})).sort((a,b)=>b.score-a.score);
   const rows = order.map((o,rank)=>`<div class="srow"><span><span class="rk">${rank+1}位</span>${PLAYER_NAMES[o.i]}</span><span>${o.score}点</span></div>`).join('');
@@ -822,6 +837,15 @@ const App = {
       document.getElementById('tab-links').innerHTML = buildLinksHtml();
       this.tabsBuilt.links = true;
     }
+  },
+
+  showIntro(){
+    this.popup = introPopupHtml();
+    this.render();
+  },
+  beginGame(){
+    this.popup = null;
+    this.newGame();
   },
 
   newGame(){
@@ -1193,10 +1217,19 @@ const App = {
     const hand = this.hands[p];
 
     if(this.reached[p]){
-      // リーチ中：手なりは固定。取れば即上がれる時だけ釣菌、それ以外は山から引いて自動で捨てる
+      // リーチ中：手なりは固定。取れば「実際に上がれる」時だけ釣菌、それ以外は山から引いて自動で捨てる
       let drawnCard, useTsurikin=false;
       if(this.pending && this.pending.card.tags.includes(this.reachTarget[p])){
-        useTsurikin = true;
+        const target = this.reachTarget[p];
+        const oldLeftover = this.hands[p].find(c=>!c.tags.includes(target));
+        if(oldLeftover){
+          const simulatedHand = this.hands[p].filter(c=>c.id!==oldLeftover.id).concat([this.pending.card]);
+          const achieved = achievedYaku(simulatedHand);
+          const lap = this.turnsTaken[p] || 1;
+          const threshold = lapThreshold(lap);
+          const qualifying = achieved.filter(y=>y.pts>=threshold);
+          if(qualifying.length>0) useTsurikin = true;
+        }
       }
       if(useTsurikin){
         drawnCard = this.pending.card;
@@ -1418,7 +1451,7 @@ const App = {
   }
 };
 
-App.newGame();
+App.showIntro();
 </script>
 </body>
 </html>
