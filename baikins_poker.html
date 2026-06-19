@@ -306,6 +306,52 @@ h1 small{
 .cls-fungi .fallback-icon{background:#DEF3EC; color:var(--fungi);}
 
 /* ---------- control panel ---------- */
+.util-row{
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:10px;
+}
+.util-btn{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700; font-size:12px;
+  background:var(--panel); border:1.5px solid var(--line); color:var(--felt-deep);
+  padding:8px 14px; border-radius:999px; cursor:pointer; box-shadow:var(--shadow);
+}
+.util-btn:disabled{opacity:.4; cursor:not-allowed;}
+.util-btn:active:not(:disabled){transform:translateY(1px);}
+
+.modal-overlay{
+  position:fixed; inset:0; z-index:55;
+  background:rgba(28,52,45,.6);
+  display:flex; align-items:center; justify-content:center; padding:16px;
+}
+.modal-card{
+  background:var(--panel); border-radius:20px; padding:18px 18px 16px;
+  max-width:520px; width:100%; max-height:85vh; overflow-y:auto;
+  box-shadow:0 16px 40px rgba(0,0,0,.4); border:2px solid var(--line);
+}
+.modal-card h3{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-size:16px; margin:0 0 10px;
+  color:var(--felt-deep); display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.modal-close{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700; font-size:12px;
+  background:var(--agar-deep); border:1px solid var(--line); color:var(--felt-deep);
+  padding:5px 12px; border-radius:999px; cursor:pointer;
+}
+.zoom-grid{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;}
+.zoom-card-wrap{display:flex; flex-direction:column; align-items:center; gap:4px;}
+.zoom-card-wrap .mcard{width:88px; min-height:122px; cursor:pointer;}
+.zoom-card-wrap .mcard .nm{font-size:11px;}
+.zoom-card-wrap .mcard .latin{font-size:8.5px;}
+.zoom-info{
+  background:var(--agar-deep); border-radius:12px; padding:10px 12px; font-size:12.5px;
+  line-height:1.7; color:#3a443c; min-height:20px;
+}
+.zoom-info b{color:var(--felt-deep);}
+.advice-line{font-size:13.5px; line-height:1.9; color:#3a443c;}
+.advice-line b{color:var(--felt-deep);}
+.advice-highlight{
+  background:var(--agar-deep); border-radius:12px; padding:10px 12px; margin:8px 0;
+}
+
 .controls{
   background:var(--panel); border-radius:16px; padding:12px 14px;
   margin-top:12px; box-shadow:var(--shadow); border:1.5px solid var(--line);
@@ -452,6 +498,8 @@ footer.disclaimer{
     </div>
   </div>
 
+  <div class="util-row" id="util-row"></div>
+
   <div class="controls">
     <div class="msg" id="msg">準備中…</div>
     <div class="btn-row" id="btn-row"></div>
@@ -481,6 +529,7 @@ footer.disclaimer{
 </div>
 
 <div id="popup-root"></div>
+<div id="modal-root"></div>
 
 <script>
 /* =========================================================
@@ -810,6 +859,12 @@ const App = {
   lastDraw:[null,null,null,null],  // 各プレイヤーの直近の取得元 'wall'=山から(ツモ) / 'tsurikin'=釣菌
   lastRoundResult:undefined,        // 直前ラウンドの結果（勝者index / 'draw' / undefined=初回）
   ronOffer:null,          // {card, discarderIdx, resumeFn, rest} リーチ中の遠隔釣菌オファー
+  zoomOpen:false,         // 拡大表示モーダルの開閉
+  zoomSelectedId:null,    // 拡大表示で選択中のカードid
+  adviceUsedThisRound:false, // アドバイスを今ラウンド使ったか
+  adviceData:null,        // 表示中のアドバイス内容
+  adviceOpen:false,       // アドバイスモーダルの開閉
+  redealUsedThisRound:false, // 親が配り直しを使ったか
   phase:'idle',         // awaitAction | awaitDiscard | postDiscard | roundEnd
   log:[],
   roundOver:false,
@@ -905,6 +960,12 @@ const App = {
     this.lastDraw = [null,null,null,null];
     this.popup = null;
     this.ronOffer = null;
+    this.zoomOpen = false;
+    this.zoomSelectedId = null;
+    this.adviceUsedThisRound = false;
+    this.adviceData = null;
+    this.adviceOpen = false;
+    this.redealUsedThisRound = false;
     this.turn = this.oya;
     this.turnsTaken = [0,0,0,0];
     this.turnsTaken[this.oya] = 1;
@@ -950,6 +1011,7 @@ const App = {
     this.lastDraw[0] = 'tsurikin';
     this.pushLog(`あなたは${fromName}の捨てた「${card.name}」を釣菌しました！`);
     this.pending = null;
+    this.removeFromDiscardLog(card.id);
     if(this.reached[0]){
       this.handleForcedAfterDraw(0, card, ()=>{ this.render(); });
       return;
@@ -1049,6 +1111,7 @@ const App = {
       this.hands[p] = this.hands[p].filter(c=>c.id!==oldLeftover.id).concat([card]);
       this.deadPile.push(oldLeftover);
       this.pending = null;
+      this.removeFromDiscardLog(card.id);
       this.lastDraw[p] = 'tsurikin';
       this.pushLog(`🎣 ${PLAYER_NAMES[p]}が${PLAYER_NAMES[discarderIdx]}の捨てた「${card.name}」を離れた場所から釣菌しました！`);
       this.render();
@@ -1070,6 +1133,7 @@ const App = {
       this.hands[0] = this.hands[0].filter(c=>c.id!==oldLeftover.id).concat([offer.card]);
       this.deadPile.push(oldLeftover);
       this.pending = null;
+      this.removeFromDiscardLog(offer.card.id);
       this.lastDraw[0] = 'tsurikin';
       this.pushLog(`🎣 あなたは${PLAYER_NAMES[offer.discarderIdx]}の捨てた「${offer.card.name}」を離れた場所から釣菌しました！`);
       this.render();
@@ -1083,6 +1147,87 @@ const App = {
       this.pushLog('あなたは釣菌を見送りました。');
       this.attemptRonClaim(offer.rest, offer.card, offer.discarderIdx, offer.resumeFn);
     }
+  },
+
+  /* ---- 拡大機能 ---- */
+  toggleZoom(){
+    if(this.turn!==0 && !this.zoomOpen){
+      // 自分の手番でなくても自分の手札は見られるので閲覧自体は許可する
+    }
+    this.zoomOpen = !this.zoomOpen;
+    if(!this.zoomOpen) this.zoomSelectedId = null;
+    this.render();
+  },
+  selectZoomCard(cardId){
+    this.zoomSelectedId = (this.zoomSelectedId===cardId)? null : cardId;
+    this.render();
+  },
+  closeZoom(){
+    this.zoomOpen = false;
+    this.zoomSelectedId = null;
+    this.render();
+  },
+
+  /* ---- アドバイス機能 ---- */
+  giveAdvice(){
+    if(this.turn!==0 || this.roundOver || this.ronOffer) return;
+    if(this.adviceUsedThisRound){
+      this.setMsg('💡 アドバイスは1ラウンドにつき1回までです。');
+      this.render();
+      return;
+    }
+    const hand = this.hands[0];
+    if(hand.length<5){ return; }
+    let discardSuggestion = null;
+    let best;
+    if(hand.length===6){
+      let bestAfter=null, bestIdx=-1;
+      hand.forEach((c,idx)=>{
+        const rest = hand.filter((_,i)=>i!==idx);
+        const bt = bestTarget(rest);
+        if(!bestAfter || bt.cnt>bestAfter.cnt || (bt.cnt===bestAfter.cnt && bt.pts>bestAfter.pts)){
+          bestAfter=bt; bestIdx=idx;
+        }
+      });
+      discardSuggestion = hand[bestIdx];
+      best = bestAfter;
+    } else {
+      best = bestTarget(hand);
+    }
+    const need = Math.max(0, 5-best.cnt);
+    const lap = this.turnsTaken[0] || 1;
+    const threshold = lapThreshold(lap);
+    this.adviceUsedThisRound = true;
+    this.adviceData = {best, discardSuggestion, need, lap, threshold};
+    this.adviceOpen = true;
+    this.pushLog('💡 アドバイスを確認しました。');
+    this.render();
+  },
+  closeAdvice(){
+    this.adviceOpen = false;
+    this.render();
+  },
+
+  /* ---- 配り直し（親のみ・1ラウンド1回） ---- */
+  canRedeal(){
+    return this.oya===0 && !this.redealUsedThisRound && this.turn===0
+      && this.phase==='awaitAction' && this.discardLog.length===0 && !this.roundOver;
+  },
+  redeal(){
+    if(!this.canRedeal()) return;
+    this.redealUsedThisRound = true;
+    const deck = shuffle(CARDS);
+    this.hands = [deck.slice(0,5),deck.slice(5,10),deck.slice(10,15),deck.slice(15,20)];
+    this.wall = deck.slice(20);
+    this.pending = null;
+    this.discardLog = [];
+    this.deadPile = [];
+    this.reached = [false,false,false,false];
+    this.reachTarget = [null,null,null,null];
+    this.lastDraw = [null,null,null,null];
+    this.pushLog('🔄 親（あなた）が配り直しを行いました。');
+    this.setMsg('配り直しました。あなたの番です。山から引くか、釣菌してください。');
+    this.render();
   },
   declareReach(p){
     if(this.reached[p] || this.roundOver) return;
@@ -1196,6 +1341,15 @@ const App = {
     if(this.pending) this.deadPile.push(this.pending.card);
     this.pending = null;
   },
+  removeFromDiscardLog(cardId){
+    // 釣菌などで手札に戻ったカードは、もう「捨て札」ではないので表示ログから消す
+    for(let i=this.discardLog.length-1; i>=0; i--){
+      if(this.discardLog[i].card.id === cardId){
+        this.discardLog.splice(i,1);
+        break;
+      }
+    }
+  },
   checkWallReplenish(){
     if(this.wall.length===1 && this.deadPile.length>0){
       const recycled = shuffle(this.deadPile);
@@ -1238,6 +1392,7 @@ const App = {
         this.lastDraw[p] = 'tsurikin';
         this.pushLog(`${PLAYER_NAMES[p]}は${fromName}の捨てた「${drawnCard.name}」を釣菌しました。`);
         this.pending = null;
+        this.removeFromDiscardLog(drawnCard.id);
       } else {
         if(this.pending) this.archivePending();
         if(this.wall.length===0){
@@ -1284,6 +1439,7 @@ const App = {
       this.lastDraw[p] = 'tsurikin';
       this.pushLog(`${PLAYER_NAMES[p]}は${fromName}の捨てた「${card.name}」を釣菌しました。`);
       this.pending = null;
+      this.removeFromDiscardLog(card.id);
     } else {
       if(this.pending) this.archivePending();
       if(this.wall.length===0){
@@ -1403,6 +1559,65 @@ const App = {
 
     // popup overlay (リーチ／あがり／順位)
     document.getElementById('popup-root').innerHTML = this.popup || '';
+
+    // utility toolbar（拡大・アドバイス・配り直し）
+    const util = document.getElementById('util-row');
+    if(util){
+      const canAct = !this.popup && !this.ronOffer;
+      let utilHtml = `<button class="util-btn" onclick="App.toggleZoom()" ${canAct? '':'disabled'}>🔍 拡大</button>`;
+      utilHtml += `<button class="util-btn" onclick="App.giveAdvice()" ${(canAct && this.turn===0 && !this.roundOver && !this.adviceUsedThisRound)? '':'disabled'}>💡 アドバイス${this.adviceUsedThisRound? '（使用済）':''}</button>`;
+      if(this.canRedeal()){
+        utilHtml += `<button class="util-btn" onclick="App.redeal()" ${canAct? '':'disabled'} style="border-color:var(--gold); color:#B8852B;">🔄 配り直し（親）</button>`;
+      }
+      util.innerHTML = utilHtml;
+    }
+
+    // 拡大モーダル
+    const modalRoot = document.getElementById('modal-root');
+    if(modalRoot){
+      if(this.zoomOpen){
+        const cardsHtml = this.hands[0].map(c=>
+          `<div class="zoom-card-wrap">${cardHtml(c,{clickable:true, onclick:`App.selectZoomCard(${c.id})`})}</div>`
+        ).join('');
+        let infoHtml = '手札のカードをタップすると、含まれる役が分かります。';
+        if(this.zoomSelectedId!==null){
+          const card = this.hands[0].find(c=>c.id===this.zoomSelectedId);
+          if(card){
+            const matchedYaku = YAKU.filter(y=>card.tags.includes(y.key)).sort((a,b)=>b.pts-a.pts);
+            const list = matchedYaku.map(y=>`「${y.label}」(${y.pts}点)`).join('、');
+            infoHtml = `<b>${card.name}</b>（${card.classification}）が含まれる役：<br>${list || 'なし'}`;
+          }
+        }
+        modalRoot.innerHTML = `<div class="modal-overlay"><div class="modal-card">
+          <h3>🔍 手札を拡大<button class="modal-close" onclick="App.closeZoom()">閉じる ✕</button></h3>
+          <div class="zoom-grid">${cardsHtml}</div>
+          <div class="zoom-info">${infoHtml}</div>
+        </div></div>`;
+      } else if(this.adviceOpen && this.adviceData){
+        const d = this.adviceData;
+        const needText = d.need===0
+          ? 'すでに役が完成しています！'
+          : `あと最低 <b>${d.need}回</b> の交換（ぴったりのカードを引く／釣菌する）で揃います。`;
+        const discardText = d.discardSuggestion
+          ? `おすすめの捨て札は <b>${d.discardSuggestion.name}</b> です。`
+          : '';
+        const thresholdText = d.threshold>0
+          ? `現在${d.lap}巡目なので、上がるには${d.threshold}点以上の役が必要です。`
+          : `現在${d.lap}巡目なので、役があればそのまま上がれます。`;
+        modalRoot.innerHTML = `<div class="modal-overlay"><div class="modal-card">
+          <h3>💡 アドバイス<button class="modal-close" onclick="App.closeAdvice()">閉じる ✕</button></h3>
+          <div class="advice-highlight">
+            <div class="advice-line">おすすめの役：<b>${d.best.label}</b>（${d.best.pts}点）</div>
+            <div class="advice-line">${discardText}</div>
+            <div class="advice-line">${needText}</div>
+          </div>
+          <div class="advice-line" style="color:#7C8A78; font-size:12px;">${thresholdText}</div>
+          <div class="advice-line" style="color:#B8852B; font-size:11.5px; margin-top:6px;">※アドバイスは1ラウンドにつき1回までです。</div>
+        </div></div>`;
+      } else {
+        modalRoot.innerHTML = '';
+      }
+    }
 
     // buttons
     const br = document.getElementById('btn-row');
