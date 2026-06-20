@@ -298,6 +298,19 @@ h1 small{
 .mcard.cls-intra{border-color:var(--intra);}
 .mcard.cls-afb{border-color:var(--afb);}
 .mcard.cls-fungi{border-color:var(--fungi);}
+
+/* ---------- open(meld) / reach-discard UI ---------- */
+.mcard.open-locked{box-shadow:0 0 0 2px var(--gold), var(--shadow); cursor:default;}
+.open-badge{
+  position:absolute; top:2px; left:2px; z-index:2;
+  font-size:7px; background:var(--gold); color:#3a2a06; font-weight:700;
+  padding:1px 4px; border-radius:5px; line-height:1.3;
+  font-family:'M PLUS Rounded 1c',sans-serif;
+}
+.mcard.small .open-badge{font-size:6px; padding:0 3px;}
+.mcard.dim-disabled{opacity:.35; cursor:not-allowed;}
+.mcard.dim-disabled.clickable{cursor:not-allowed;}
+.btn.reach-armed{background:rgba(217,164,65,.22); border-color:var(--gold); color:#B8852B;}
 .cls-gpos .fallback-icon{background:#EFE6FB; color:var(--gpos);}
 .cls-gneg .fallback-icon{background:#FBE6E1; color:var(--gneg);}
 .cls-atyp .fallback-icon{background:#E3EEFB; color:var(--atyp);}
@@ -445,6 +458,21 @@ footer.disclaimer{
   font-size:13.5px; font-weight:500; color:#3a443c; line-height:1.8; text-align:left;
   margin-top:10px;
 }
+.popup-card{max-height:88vh; overflow-y:auto;}
+.settings-list{margin-top:10px; text-align:left;}
+.setting-group{margin-bottom:14px; padding-bottom:12px; border-bottom:1px dashed var(--line);}
+.setting-group:last-child{border-bottom:none; margin-bottom:0;}
+.setting-label{font-family:'M PLUS Rounded 1c',sans-serif; font-weight:700; font-size:13.5px; color:var(--felt-deep); margin-bottom:6px;}
+.setting-opts{display:flex; gap:6px; flex-wrap:wrap;}
+.setting-opt{
+  font-family:'M PLUS Rounded 1c',sans-serif; font-size:12px; font-weight:600;
+  padding:7px 12px; border-radius:16px; border:1.5px solid var(--line);
+  background:var(--panel); color:#566154; cursor:pointer;
+  transition:all .12s;
+}
+.setting-opt:hover{border-color:var(--gold);}
+.setting-opt.active{background:var(--gold); border-color:var(--gold); color:#3a2a06;}
+.setting-desc{font-size:11px; color:#7C8A78; margin-top:6px; line-height:1.5;}
 @keyframes popupFade{from{opacity:0;} to{opacity:1;}}
 @keyframes popupPop{0%{transform:scale(.55); opacity:0;} 100%{transform:scale(1); opacity:1;}}
 
@@ -611,8 +639,11 @@ function latinHtml(parts){
 function cardHtml(card, opts={}){
   const small = opts.small? ' small':'';
   const clickable = opts.clickable? ' clickable discardable':'';
+  const openCls = opts.openLocked? ' open-locked':'';
+  const dimCls = opts.dim? ' dim-disabled':'';
   const onclick = opts.onclick? ` onclick="${opts.onclick}"`:'';
-  return `<div class="mcard cls-${card.classKey}${small}${clickable}"${onclick} title="${card.classification}">
+  return `<div class="mcard cls-${card.classKey}${small}${clickable}${openCls}${dimCls}"${onclick} title="${card.classification}">
+    ${opts.openLocked? '<div class="open-badge">🔓晒</div>':''}
     <div class="art"><img src="${card.img}" alt="${card.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon">${card.icon}</span></div>
     <div class="nm">${card.name}</div>
     ${opts.small? '' : `<div class="latin">${latinHtml(card.latin)}</div>`}
@@ -634,6 +665,7 @@ function achievedYaku(hand){
   return YAKU.filter(y => hand.length===5 && hand.every(c=>c.tags.includes(y.key)));
 }
 function lapThreshold(lap){
+  if(App.settings && App.settings.lapThresholdEnabled===false) return 0;
   if(lap<=1) return 50;
   if(lap===2) return 30;
   if(lap===3) return 20;
@@ -641,7 +673,7 @@ function lapThreshold(lap){
 }
 function lapThresholdLabel(lap){
   const t = lapThreshold(lap);
-  return t>0 ? `${lap}巡目（${t}点以上で上がり可）` : `${lap}巡目以降（役があれば上がり可）`;
+  return t>0 ? `${lap}巡目（${t}CFU以上で上がり可）` : `${lap}巡目以降（役があれば上がり可）`;
 }
 
 /* ---------------- popup helpers ---------------- */
@@ -655,7 +687,7 @@ function winPopupHtml(name, yakuLabel, totalPts, breakdown){
   return `<div class="popup-overlay"><div class="popup-card">
     <div class="ptitle">🏆 あがり！</div>
     <div class="psub">${name}</div>
-    <div class="pdetail">「${yakuLabel}」 ＋${totalPts}点</div>
+    <div class="pdetail">「${yakuLabel}」 ＋${totalPts}CFU</div>
     ${breakdown? `<div class="pdetail" style="margin-top:2px;">${breakdown}</div>` : ''}
   </div></div>`;
 }
@@ -672,18 +704,104 @@ function introPopupHtml(){
     <div class="ptitle" style="font-size:24px;">🦠 バイキンズポーカー</div>
     <div class="intro-desc">
       32種のバイキンズ（細菌・真菌）カードを使った、麻雀とポーカーを混ぜたようなゲームです。<br><br>
-      あなた1人 vs CPU3人。手札5枚で「役」を揃えて、自己申告で「あがり」を目指しましょう。<br><br>
+      あなた1人 vs CPU3人。手札5枚で「役」を揃えて、自己申告で「あがり」を目指しましょう。持ち点は全員10000CFUからスタートし、誰かが0CFU以下になったら終了です。<br><br>
       くわしいルールは、ゲーム中いつでも上の「📖解説」タブから確認できます。
     </div>
-    <button class="btn btn-gold" style="margin-top:16px; font-size:15px; padding:12px 30px;" onclick="App.beginGame()">▶ はじめる</button>
+    <div style="display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
+      <button class="btn btn-gold" style="font-size:15px; padding:12px 24px;" onclick="App.beginGame()">▶ かんたんスタート</button>
+      <button class="btn btn-outline" style="font-size:14px; padding:12px 20px; border-color:var(--gold); color:#B8852B;" onclick="App.showSettings()">⚙️ くわしく設定する</button>
+    </div>
+  </div></div>`;
+}
+function defaultSettings(){
+  return {
+    wallRefill: true,       // 捨て札を山に戻すか
+    maxLaps: 10,             // 1ラウンドの最大巡数（nullで無制限）
+    lapThresholdEnabled: true, // 巡目によるあがり点数のしばり
+    startingScore: 10000,    // 開始持ち点
+    maxRounds: 50             // ゲーム終了の安全装置（最大ラウンド数）
+  };
+}
+function settingOptBtn(label, active, onclick){
+  return `<button class="setting-opt${active? ' active':''}" onclick="${onclick}">${label}</button>`;
+}
+function settingsPopupHtml(s){
+  return `<div class="popup-overlay"><div class="popup-card" style="max-width:420px;">
+    <div class="ptitle" style="font-size:20px;">⚙️ くわしく設定する</div>
+    <div class="settings-list">
+
+      <div class="setting-group">
+        <div class="setting-label">① 捨て札を山に戻すか</div>
+        <div class="setting-opts">
+          ${settingOptBtn('する（推奨）', s.wallRefill===true, `App.setSetting('wallRefill', true)`)}
+          ${settingOptBtn('しない', s.wallRefill===false, `App.setSetting('wallRefill', false)`)}
+        </div>
+        <div class="setting-desc">${s.wallRefill? '山が残り1枚になったら捨て札を補充。ラウンドが長引きやすくなります。':'山を引ききったら流局。テンポよく決着がつきます。'}</div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">② 1ラウンドの最大巡数</div>
+        <div class="setting-opts">
+          ${settingOptBtn('8巡', s.maxLaps===8, `App.setSetting('maxLaps', 8)`)}
+          ${settingOptBtn('10巡（推奨）', s.maxLaps===10, `App.setSetting('maxLaps', 10)`)}
+          ${settingOptBtn('15巡', s.maxLaps===15, `App.setSetting('maxLaps', 15)`)}
+          ${settingOptBtn('無制限', s.maxLaps===null, `App.setSetting('maxLaps', null)`)}
+        </div>
+        <div class="setting-desc">${s.maxLaps? `その巡数を超えても誰もあがれなければ、流局として打ち切ります。`:'巡数による打ち切りはせず、山が尽きるまで続けます。'}</div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">③ 巡目によるあがり点数のしばり</div>
+        <div class="setting-opts">
+          ${settingOptBtn('しばりあり（推奨）', s.lapThresholdEnabled===true, `App.setSetting('lapThresholdEnabled', true)`)}
+          ${settingOptBtn('しばりなし', s.lapThresholdEnabled===false, `App.setSetting('lapThresholdEnabled', false)`)}
+        </div>
+        <div class="setting-desc">${s.lapThresholdEnabled? '1巡目50CFU・2巡目30CFU・3巡目20CFU以上必要、4巡目以降は役のみでOK。':'何巡目でも役が完成していればいつでもあがれます。'}</div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">④ 開始持ち点</div>
+        <div class="setting-opts">
+          ${settingOptBtn('5000CFU', s.startingScore===5000, `App.setSetting('startingScore', 5000)`)}
+          ${settingOptBtn('10000CFU（推奨）', s.startingScore===10000, `App.setSetting('startingScore', 10000)`)}
+          ${settingOptBtn('20000CFU', s.startingScore===20000, `App.setSetting('startingScore', 20000)`)}
+        </div>
+        <div class="setting-desc">少ないほど早く決着がつき、多いほどじっくり遊べます。</div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">⑤ ゲーム終了の安全装置（最大ラウンド数）</div>
+        <div class="setting-opts">
+          ${settingOptBtn('30ラウンド', s.maxRounds===30, `App.setSetting('maxRounds', 30)`)}
+          ${settingOptBtn('50ラウンド（推奨）', s.maxRounds===50, `App.setSetting('maxRounds', 50)`)}
+          ${settingOptBtn('100ラウンド', s.maxRounds===100, `App.setSetting('maxRounds', 100)`)}
+        </div>
+        <div class="setting-desc">誰も0CFU以下にならないまま続いた場合、この回数で打ち切り、その時点の最高所持者の優勝とします。</div>
+      </div>
+
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center; margin-top:14px;">
+      <button class="btn btn-outline" onclick="App.showIntro()">← 戻る</button>
+      <button class="btn btn-gold" onclick="App.confirmSettings()">▶ この設定で始める</button>
+    </div>
   </div></div>`;
 }
 function standingsPopupHtml(scores){
   const order = [0,1,2,3].map(i=>({i, score:scores[i]})).sort((a,b)=>b.score-a.score);
-  const rows = order.map((o,rank)=>`<div class="srow"><span><span class="rk">${rank+1}位</span>${PLAYER_NAMES[o.i]}</span><span>${o.score}点</span></div>`).join('');
+  const rows = order.map((o,rank)=>`<div class="srow"><span><span class="rk">${rank+1}位</span>${PLAYER_NAMES[o.i]}</span><span>${o.score.toLocaleString()} CFU</span></div>`).join('');
   return `<div class="popup-overlay"><div class="popup-card">
     <div class="ptitle">📊 現在の順位</div>
     <div class="standings-list">${rows}</div>
+  </div></div>`;
+}
+function finalStandingsPopupHtml(scores, reasonText){
+  const order = [0,1,2,3].map(i=>({i, score:scores[i]})).sort((a,b)=>b.score-a.score);
+  const rows = order.map((o,rank)=>`<div class="srow"><span><span class="rk">${rank+1}位</span>${PLAYER_NAMES[o.i]}</span><span>${o.score.toLocaleString()} CFU</span></div>`).join('');
+  return `<div class="popup-overlay"><div class="popup-card">
+    <div class="ptitle">🏁 ゲーム終了！</div>
+    ${reasonText? `<div class="psub" style="font-size:12.5px; line-height:1.5;">${reasonText}</div>`:''}
+    <div class="standings-list">${rows}</div>
+    <button class="btn btn-gold" style="margin-top:14px; font-size:14px; padding:10px 26px;" onclick="App.newGame()">🔄 新しいゲームを始める</button>
   </div></div>`;
 }
 
@@ -698,8 +816,10 @@ function buildExplainHtml(){
   <div class="doc-section">
     <h2>🃏 準備</h2>
     <ul>
+      <li>開始時に「かんたんスタート」か「くわしく設定する」かを選べます。くわしく設定すると、捨て札を山に戻すか・1ラウンドの最大巡数・巡目によるあがり点数のしばりの有無・開始持ち点・ゲーム終了の安全装置（最大ラウンド数）の5項目を変更できます（数値は下記がデフォルト値です）</li>
       <li>32枚のバイキンズカードをシャッフルし、4人に5枚ずつ配ります</li>
       <li>残りの12枚が山札になります</li>
+      <li>持ち点は全員<b>10000CFU</b>からスタートします（合計CFUは常に一定）</li>
     </ul>
   </div>
 
@@ -753,35 +873,56 @@ function buildExplainHtml(){
     <p>ただし、巡目（自分が何回目の手番に入っているか）によって、あがるために必要な最低点数が変わります。</p>
     <table class="threshold-table">
       <tr><th>巡目</th><th>必要点数</th></tr>
-      <tr><td>1巡目</td><td>50点以上</td></tr>
-      <tr><td>2巡目</td><td>30点以上</td></tr>
-      <tr><td>3巡目</td><td>20点以上</td></tr>
+      <tr><td>1巡目</td><td>50CFU以上</td></tr>
+      <tr><td>2巡目</td><td>30CFU以上</td></tr>
+      <tr><td>3巡目</td><td>20CFU以上</td></tr>
       <tr><td>4巡目以降</td><td>役があればOK</td></tr>
     </table>
-    <p><b>ツモあがり</b>（山から引いた札で役が完成した場合）は<b>+10点ボーナス</b>が付きます。<b>釣菌あがり</b>（釣菌した札で役が完成した場合）はボーナスなしです。さらに、あがったのが親なら最後に点数が2倍になります。</p>
+    <p>役が2種類以上同時に揃っている場合は、自動的に最も点数の高い役が採用されます（あがり時のログに、揃っていた他の役名もあわせて表示されます）。</p>
+    <p><b>直前の人が捨てた札（釣菌）で役が完成した場合は、リーチをしていなくてもそのまま「釣菌あがり」が成立します。</b>直前以外の人の捨て札であがるには、後述の「リーチ」が必要です。</p>
+  </div>
+
+  <div class="doc-section">
+    <h2>💰 CFU（持ち点）について</h2>
+    <ul>
+      <li>持ち点の単位は<b>CFU</b>です。全員10000CFUからスタートし、4人の合計は常に40000CFUのまま変わりません（誰かが得た分は、必ず他の誰かが払った分です）</li>
+      <li><b>ツモあがり</b>（山から引いた札で役が完成）：役の点数＋ツモボーナス100CFUを、他の3人それぞれから1人あたりその金額もらいます（親なら金額を2倍にしてから請求）</li>
+      <li><b>釣菌あがり</b>（釣菌した札で役が完成）：役の点数を、その札を捨てた本人からのみもらいます（親なら2倍）</li>
+      <li><b>リーチした状態であがった場合</b>：上記とは別に、他の3人から100CFUずつ追加でもらえます。ただし相手もリーチ済みの場合は、その人がすでに供託している100CFUをそのまま回収する形になります（二重には取りません）</li>
+      <li>誰かが流局、またはリーチしていない人があがった場合、その時点で場に出ている供託金（リーチ時の100CFU）は、出した本人にそのまま返却されます</li>
+      <li>持ち点が<b>100CFU未満</b>の人は、リーチの掛け金が払えないためリーチできません</li>
+      <li>誰か1人でも<b>0CFU以下</b>になった時点でゲーム終了、その時点の持ち点で最終順位を発表します（安全装置として、50ラウンドを経過した場合もその時点の最高所持者の優勝として終了します）</li>
+    </ul>
   </div>
 
   <div class="doc-section">
     <h2>🚩 リーチについて</h2>
     <ul>
-      <li>手札5枚が「あと1枚で役完成」（テンパイ）、または役がすでに完成している状態になったら、「リーチ宣言」ができます</li>
-      <li><b>ツモあがり（山から引いた札で揃える）はリーチなしでもOKです</b></li>
-      <li><b>釣菌であがるには、必ずリーチが必要です。</b>リーチしていない状態で釣菌した札では上がれません</li>
+      <li><b>リーチ宣言は「捨てるタイミング」でのみ行えます。</b>6枚になった時点（引いた直後）に、捨てた結果ちょうど「あと1枚で役完成」（テンパイ）になるカードを選んで捨てると、同時にリーチが成立します。すでに役が完成した状態からの後出しリーチはできません</li>
+      <li>リーチ宣言時に、場に<b>100CFU</b>を供託します（自分の持ち点から減算されます）</li>
+      <li><b>ツモあがり・直前の人からの釣菌あがりは、リーチなしでもOKです。</b>リーチの利点は、①直前以外の人の捨て札からもあがれるようになること、②あがった時に100CFUずつの追加報酬がもらえること、の2つです</li>
       <li>一度リーチすると、その後は手札を自由に選べなくなります。引いた札が待っている役と合えば自動でいらない方を捨てて判定、合わなければ引いた札をそのまま自動で捨てます。<b>リーチを途中で崩すことはできません</b></li>
     </ul>
   </div>
 
   <div class="doc-section">
-    <h2>🔄 山札がなくなりそうなとき</h2>
+    <h2>🔓 釣菌した札の公開について</h2>
+    <p>釣菌（直前の人からでも、リーチ中に離れた人からでも）で取ったカードは、その瞬間に公開され、手札の中で常に表向きになります。公開された札は<b>二度と捨てることができません</b>。捨てる時は、公開されていない残りのカードの中から選びます。CPUが釣菌した札も、ラウンド終了を待たずにその場で表向きに表示されます。</p>
+  </div>
 
-    <p>山札の残りが1枚になると、それまでに誰にも釣菌されなかった捨て札をすべてシャッフルし、残り1枚の下に補充します。補充分も引き尽くされ、捨て札も無くなった場合は<b>流局</b>（引き分け）として、そのラウンドは終了します。</p>
+  <div class="doc-section">
+    <h2>🔄 山札がなくなりそうなとき／巡数による打ち切り</h2>
+
+    <p>「捨て札を山に戻す」設定が<b>する</b>（デフォルト）の場合、山札の残りが1枚になると、それまでに誰にも釣菌されなかった捨て札をすべてシャッフルし、残り1枚の下に補充します。<b>しない</b>設定の場合は補充されません。</p>
+    <p>補充がない、または補充分も引き尽くされ捨て札も無くなった場合は<b>流局</b>（引き分け）として、そのラウンドは終了します（供託中のリーチ金は出した本人に返却されます）。また、設定した最大巡数（デフォルト10巡）を誰かが超えても誰もあがれなかった場合も、同様に流局として打ち切られます。</p>
   </div>
 
   <div class="doc-section">
     <h2>📚 用語ミニ辞典</h2>
     <div class="glossary-grid">
-      <div class="glossary-item"><b>釣菌</b><span>前の人が捨てたカードを山引きの代わりに取ること</span></div>
-      <div class="glossary-item"><b>リーチ</b><span>あと1枚で役完成の状態で宣言する、あがりの予告</span></div>
+      <div class="glossary-item"><b>釣菌</b><span>前の人が捨てたカードを山引きの代わりに取ること。取った瞬間に公開され、以後捨てられなくなる</span></div>
+      <div class="glossary-item"><b>リーチ</b><span>テンパイになる捨て方をした瞬間に宣言する、あがりの予告。100CFUを供託する</span></div>
+      <div class="glossary-item"><b>CFU</b><span>このゲームでの持ち点の単位。全員10000CFUからスタートし、合計は常に一定</span></div>
       <div class="glossary-item"><b>巡目</b><span>自分が何回目の手番に入っているかの回数</span></div>
       <div class="glossary-item"><b>流局</b><span>山札（と捨て札）が尽きて誰も上がれずラウンド終了</span></div>
       <div class="glossary-item"><b>親</b><span>そのラウンドの最初の手番の人。あがると点数2倍</span></div>
@@ -798,7 +939,7 @@ function buildYakuHtml(){
     const examples = CARDS.filter(c=>c.tags.includes(y.key)).slice(0,5);
     const cardsHtml = examples.map(c=>cardHtml(c,{small:true})).join('');
     return `<div class="yaku-row">
-      <div class="ylabel">${y.label}<br><span class="ypts">${y.pts}点</span></div>
+      <div class="ylabel">${y.label}<br><span class="ypts">${y.pts}CFU</span></div>
       <div class="ycards">${cardsHtml}</div>
     </div>`;
   }).join('');
@@ -844,7 +985,7 @@ function buildLinksHtml(){
 
 /* ---------------- game state ---------------- */
 const App = {
-  scores:[0,0,0,0],
+  scores:[10000,10000,10000,10000],
   hands:[[],[],[],[]],
   wall:[],
   pending:null,        // {card, by}
@@ -852,8 +993,16 @@ const App = {
   turn:0,
   turnsTaken:[0,0,0,0],  // 巡目カウント（各プレイヤーが何巡目に入っているか）
   deadPile:[],            // 誰にも取られなかった捨て札（山が1枚になったら補充に使う）
-  reached:[false,false,false,false],   // リーチ済みか
+  reached:[false,false,false,false],   // リーチ済みか（=100CFU供託済み）
   reachTarget:[null,null,null,null],   // リーチ時に固定した狙いの役キー
+  openIds:[[],[],[],[]],   // 釣菌して獲得し、公開・固定（捨てられない）になったカードidの一覧
+  lastDrawFrom:[null,null,null,null],  // 直近のカードを誰の捨て札から釣菌したか（ツモの場合はnull）
+  reachArmed:false,        // 「リーチして捨てる」モードがONか（捨てる瞬間にリーチ宣言するためのトグル）
+  roundsPlayed:0,           // 終了したラウンド数（安全装置用）
+  gameOver:false,
+  gameOverReason:null,
+  settings:null,            // 確定済みのゲーム設定（defaultSettings()参照）
+  pendingSettings:null,     // 設定画面で選択中（未確定）の内容
   popup:null,             // 現在表示中のポップアップHTML（null=非表示）
   oya:0,                  // 親（その局の開始プレイヤー）のインデックス
   lastDraw:[null,null,null,null],  // 各プレイヤーの直近の取得元 'wall'=山から(ツモ) / 'tsurikin'=釣菌
@@ -865,7 +1014,7 @@ const App = {
   adviceData:null,        // 表示中のアドバイス内容
   adviceOpen:false,       // アドバイスモーダルの開閉
   redealUsedThisRound:false, // 親が配り直しを使ったか
-  phase:'idle',         // awaitAction | awaitDiscard | postDiscard | roundEnd
+  phase:'idle',         // awaitAction | awaitDiscard | postDiscard | roundEnd | gameOver
   log:[],
   roundOver:false,
   activeTab:'play',
@@ -899,15 +1048,42 @@ const App = {
     this.render();
   },
   beginGame(){
+    this.settings = defaultSettings();
+    this.popup = null;
+    this.newGame();
+  },
+  showSettings(){
+    this.pendingSettings = this.settings? {...this.settings} : defaultSettings();
+    this.popup = settingsPopupHtml(this.pendingSettings);
+    this.render();
+  },
+  setSetting(key, value){
+    if(!this.pendingSettings) this.pendingSettings = defaultSettings();
+    this.pendingSettings[key] = value;
+    this.popup = settingsPopupHtml(this.pendingSettings);
+    this.render();
+  },
+  confirmSettings(){
+    this.settings = this.pendingSettings? {...this.pendingSettings} : defaultSettings();
+    this.pendingSettings = null;
     this.popup = null;
     this.newGame();
   },
 
   newGame(){
-    this.scores=[0,0,0,0];
+    if(!this.settings) this.settings = defaultSettings();
+    const s = this.settings;
+    this.scores=[s.startingScore, s.startingScore, s.startingScore, s.startingScore];
     this.log=[];
     this.lastRoundResult = undefined;
-    this.pushLog('新しいゲームを開始しました。配牌5枚ずつ、山12枚です。');
+    this.roundsPlayed = 0;
+    this.gameOver = false;
+    this.gameOverReason = null;
+    this.popup = null;
+    const laps = s.maxLaps? `最大${s.maxLaps}巡` : '巡数無制限';
+    const refill = s.wallRefill? '捨て札補充あり' : '捨て札補充なし';
+    const threshold = s.lapThresholdEnabled? '点数しばりあり' : '点数しばりなし';
+    this.pushLog(`新しいゲームを開始しました。全員${s.startingScore.toLocaleString()}CFUからスタート、配牌5枚ずつ、山12枚です。（${laps}／${refill}／${threshold}）`);
     this.runOyaSlot();
   },
 
@@ -957,6 +1133,9 @@ const App = {
     this.deadPile = [];
     this.reached = [false,false,false,false];
     this.reachTarget = [null,null,null,null];
+    this.openIds = [[],[],[],[]];
+    this.lastDrawFrom = [null,null,null,null];
+    this.reachArmed = false;
     this.lastDraw = [null,null,null,null];
     this.popup = null;
     this.ronOffer = null;
@@ -971,7 +1150,7 @@ const App = {
     this.turnsTaken[this.oya] = 1;
     this.phase = 'awaitAction';
     this.roundOver = false;
-    this.pushLog(`--- ラウンド開始（親:${PLAYER_NAMES[this.oya]}／1巡目50点・2巡目30点・3巡目20点・4巡目以降は役のみでOK。ツモあがりはリーチ不要、釣菌であがるにはリーチが必要） ---`);
+    this.pushLog(`--- ラウンド開始（親:${PLAYER_NAMES[this.oya]}／1巡目50CFU・2巡目30CFU・3巡目20CFU・4巡目以降は役のみでOK。ツモあがり・直前の人からの釣菌あがりはリーチ不要。リーチ中は離れた人からも釣菌可） ---`);
     this.setMsg(this.turn===0
       ? 'あなたの番です。山から引くか、釣菌してください。'
       : `${PLAYER_NAMES[this.turn]}（親）が考えています…`);
@@ -988,42 +1167,73 @@ const App = {
   /* ---- human / generic actions ---- */
   drawFromWall(){
     if(this.phase!=='awaitAction' || this.turn!==0) return;
-    if(this.wall.length===0){ this.handleDraw(); return; }
+    if(this.wall.length===0){ this.triggerDraw("wall"); return; }
     if(this.pending){ this.archivePending(); }
     const card = this.wall.pop();
     this.checkWallReplenish();
     this.hands[0].push(card);
     this.lastDraw[0] = 'wall';
+    this.lastDrawFrom[0] = null;
     this.pushLog(`あなたは山から引きました。`);
     if(this.reached[0]){
       this.handleForcedAfterDraw(0, card, ()=>{ this.render(); });
       return;
     }
+    this.reachArmed = false;
     this.phase='awaitDiscard';
-    this.setMsg('捨てるカードをタップしてください。');
+    this.setMsg('捨てるカードをタップしてください。テンパイになるならリーチもできます。');
     this.render();
   },
   tsurikin(){
     if(this.phase!=='awaitAction' || this.turn!==0 || !this.pending) return;
+    if(this.reached[0] && !this.pending.card.tags.includes(this.reachTarget[0])) return;
     const card = this.pending.card;
-    const fromName = PLAYER_NAMES[this.pending.by];
+    const fromIdx = this.pending.by;
+    const fromName = PLAYER_NAMES[fromIdx];
     this.hands[0].push(card);
     this.lastDraw[0] = 'tsurikin';
-    this.pushLog(`あなたは${fromName}の捨てた「${card.name}」を釣菌しました！`);
+    this.lastDrawFrom[0] = fromIdx;
+    this.openIds[0].push(card.id);
+    this.pushLog(`あなたは${fromName}の捨てた「${card.name}」を釣菌しました！（この札は公開され、もう捨てられません）`);
     this.pending = null;
     this.removeFromDiscardLog(card.id);
     if(this.reached[0]){
       this.handleForcedAfterDraw(0, card, ()=>{ this.render(); });
       return;
     }
+    this.reachArmed = false;
     this.phase='awaitDiscard';
-    this.setMsg('捨てるカードをタップしてください。');
+    this.setMsg('捨てるカードをタップしてください。テンパイになるならリーチもできます。');
     this.render();
   },
   humanDiscard(cardId){
     if(this.phase!=='awaitDiscard' || this.turn!==0) return;
+    if(this.openIds[0].includes(cardId)) return; // 公開済み(釣菌で取った)カードは捨てられない
     const idx = this.hands[0].findIndex(c=>c.id===cardId);
     if(idx<0) return;
+    if(this.reachArmed && !this.reached[0] && this.scores[0]>=100){
+      const rest = this.hands[0].filter(c=>c.id!==cardId);
+      const bt = bestTarget(rest);
+      if(bt.cnt!==4) return; // テンパイにならない捨て方ではリーチ宣言不可
+      const [card] = this.hands[0].splice(idx,1);
+      this.pending = {card, by:0};
+      this.discardLog.push({card, by:0});
+      this.reached[0] = true;
+      this.reachTarget[0] = bt.key;
+      this.scores[0] -= 100;
+      this.reachArmed = false;
+      this.pushLog(`🚩 あなたは「${card.name}」を捨ててリーチしました！（「${bt.label}」待ち・100CFU供託）`);
+      this.popup = reachPopupHtml('あなた');
+      this.render();
+      setTimeout(()=>{ this.popup = null; this.render(); }, 900);
+      this.processDiscard(card, 0, ()=>{
+        this.phase='postDiscard';
+        this.setMsg(`🚩 リーチ中です。「${bt.label}」待ちです。「次の人へ」進めてください。`);
+        this.render();
+      });
+      return;
+    }
+    this.reachArmed = false;
     const [card] = this.hands[0].splice(idx,1);
     this.pending = {card, by:0};
     this.discardLog.push({card, by:0});
@@ -1032,7 +1242,7 @@ const App = {
     this.processDiscard(card, 0, ()=>{
       this.phase='postDiscard';
       const lap = this.turnsTaken[0] || 1;
-      this.setMsg(`役が完成していれば「あがり宣言」を（${lapThresholdLabel(lap)}）。テンパイならリーチもできます。なければ「次の人へ」進めてください。`);
+      this.setMsg(`役が完成していれば「あがり宣言」を（${lapThresholdLabel(lap)}）。なければ「次の人へ」進めてください。`);
       this.render();
     });
   },
@@ -1047,7 +1257,7 @@ const App = {
   },
   handleForcedAfterDraw(p, drawnCard, resumeFn){
     const target = this.reachTarget[p];
-    const oldLeftover = this.hands[p].find(c => c.id!==drawnCard.id && !c.tags.includes(target));
+    const oldLeftover = this.hands[p].find(c => c.id!==drawnCard.id && !c.tags.includes(target) && !this.openIds[p].includes(c.id));
     let discardedCard;
     if(oldLeftover && drawnCard.tags.includes(target)){
       discardedCard = oldLeftover;
@@ -1074,7 +1284,7 @@ const App = {
       if(!this.reached[p]) continue;
       const target = this.reachTarget[p];
       if(!discardedCard.tags.includes(target)) continue;
-      const oldLeftover = this.hands[p].find(c=>!c.tags.includes(target));
+      const oldLeftover = this.hands[p].find(c=>!c.tags.includes(target) && !this.openIds[p].includes(c.id));
       if(!oldLeftover) continue; // 既に完成している等、想定外のケースはスキップ
       const simulatedHand = this.hands[p].filter(c=>c.id!==oldLeftover.id).concat([discardedCard]);
       const achieved = achievedYaku(simulatedHand);
@@ -1107,13 +1317,15 @@ const App = {
       this.render();
     } else {
       const target = this.reachTarget[p];
-      const oldLeftover = this.hands[p].find(c=>!c.tags.includes(target));
+      const oldLeftover = this.hands[p].find(c=>!c.tags.includes(target) && !this.openIds[p].includes(c.id));
       this.hands[p] = this.hands[p].filter(c=>c.id!==oldLeftover.id).concat([card]);
       this.deadPile.push(oldLeftover);
       this.pending = null;
       this.removeFromDiscardLog(card.id);
       this.lastDraw[p] = 'tsurikin';
-      this.pushLog(`🎣 ${PLAYER_NAMES[p]}が${PLAYER_NAMES[discarderIdx]}の捨てた「${card.name}」を離れた場所から釣菌しました！`);
+      this.lastDrawFrom[p] = discarderIdx;
+      this.openIds[p].push(card.id);
+      this.pushLog(`🎣 ${PLAYER_NAMES[p]}が${PLAYER_NAMES[discarderIdx]}の捨てた「${card.name}」を離れた場所から釣菌しました！（公開されます）`);
       this.render();
       setTimeout(()=>{
         const won = this.declareWin(p);
@@ -1129,13 +1341,15 @@ const App = {
     this.ronOffer = null;
     if(accept){
       const target = this.reachTarget[0];
-      const oldLeftover = this.hands[0].find(c=>!c.tags.includes(target));
+      const oldLeftover = this.hands[0].find(c=>!c.tags.includes(target) && !this.openIds[0].includes(c.id));
       this.hands[0] = this.hands[0].filter(c=>c.id!==oldLeftover.id).concat([offer.card]);
       this.deadPile.push(oldLeftover);
       this.pending = null;
       this.removeFromDiscardLog(offer.card.id);
       this.lastDraw[0] = 'tsurikin';
-      this.pushLog(`🎣 あなたは${PLAYER_NAMES[offer.discarderIdx]}の捨てた「${offer.card.name}」を離れた場所から釣菌しました！`);
+      this.lastDrawFrom[0] = offer.discarderIdx;
+      this.openIds[0].push(offer.card.id);
+      this.pushLog(`🎣 あなたは${PLAYER_NAMES[offer.discarderIdx]}の捨てた「${offer.card.name}」を離れた場所から釣菌しました！（公開されます）`);
       this.render();
       setTimeout(()=>{
         const won = this.declareWin(0);
@@ -1224,35 +1438,36 @@ const App = {
     this.deadPile = [];
     this.reached = [false,false,false,false];
     this.reachTarget = [null,null,null,null];
+    this.openIds = [[],[],[],[]];
+    this.lastDrawFrom = [null,null,null,null];
+    this.reachArmed = false;
     this.lastDraw = [null,null,null,null];
     this.pushLog('🔄 親（あなた）が配り直しを行いました。');
     this.setMsg('配り直しました。あなたの番です。山から引くか、釣菌してください。');
     this.render();
   },
-  declareReach(p){
-    if(this.reached[p] || this.roundOver) return;
-    const hand = this.hands[p];
-    const bt = bestTarget(hand);
-    if(bt.cnt<4){
-      if(p===0){ this.setMsg('まだテンパイ（あと1枚で役完成）の状態ではないため、リーチできません。'); this.render(); }
-      return;
-    }
-    const alreadyComplete = bt.cnt>=5;
-    this.reached[p] = true;
-    this.reachTarget[p] = bt.key;
-    this.pushLog(`🚩 ${PLAYER_NAMES[p]}がリーチ！（「${bt.label}」${alreadyComplete? '完成':'待ち'}）`);
-    this.popup = reachPopupHtml(PLAYER_NAMES[p]);
+  toggleReachArm(){
+    if(this.phase!=='awaitDiscard' || this.turn!==0) return;
+    if(this.reached[0] || this.scores[0]<100) return;
+    this.reachArmed = !this.reachArmed;
     this.render();
-    setTimeout(()=>{
-      this.popup = null;
-      if(alreadyComplete){
-        const won = this.declareWin(p);
-        if(!won && p===0){ this.render(); }
-      } else {
-        if(p===0){ this.setMsg(`🚩 リーチしました！「${bt.label}」待ちです。次に揃ったら上がれます。`); }
-        this.render();
-      }
-    }, 1000);
+  },
+  checkGameOver(){
+    const bustedIdx = this.scores.findIndex(s=>s<=0);
+    if(bustedIdx>=0){
+      this.gameOver = true;
+      this.phase = 'gameOver';
+      this.gameOverReason = `${PLAYER_NAMES[bustedIdx]}の持ち点が0CFU以下になったため、ここでゲーム終了です。`;
+      return true;
+    }
+    const maxRounds = (this.settings && this.settings.maxRounds) || 50;
+    if((this.roundsPlayed||0) >= maxRounds){
+      this.gameOver = true;
+      this.phase = 'gameOver';
+      this.gameOverReason = `${maxRounds}ラウンドに達したため、その時点の最高所持者の優勝としてゲーム終了です。`;
+      return true;
+    }
+    return false;
   },
   declareWin(playerIdx){
     const hand = this.hands[playerIdx];
@@ -1274,41 +1489,87 @@ const App = {
       return false;
     }
     const isTsurikinWin = (this.lastDraw[playerIdx] === 'tsurikin');
-    if(isTsurikinWin && !this.reached[playerIdx]){
-      if(playerIdx===0){
-        this.pushLog('あがり宣言 → 釣菌であがるにはリーチが必要です。');
-        this.setMsg('<span class="win">釣菌であがるにはリーチが必要です。</span>ツモ（山から引いた札）であがる場合はリーチなしでもOKです。');
-        this.render();
-      }
-      return false;
-    }
     const best = qualifying.reduce((a,b)=> b.pts>a.pts? b:a);
-    const tsumoBonus = isTsurikinWin? 0 : 10;
     const isOya = (playerIdx === this.oya);
-    let total = best.pts + tsumoBonus;
-    if(isOya) total *= 2;
+    const tsumoBonus = isTsurikinWin? 0 : 100;
+    let perPayment = best.pts + tsumoBonus;
+    if(isOya) perPayment *= 2;
 
-    this.scores[playerIdx] += total;
+    // ---- 基本の精算（ツモ＝全員から／釣菌＝捨てた本人のみから） ----
+    let basePaid = 0;
+    if(isTsurikinWin){
+      const discarderIdx = this.lastDrawFrom[playerIdx];
+      if(discarderIdx!==null && discarderIdx!==undefined && discarderIdx!==playerIdx){
+        this.scores[discarderIdx] -= perPayment;
+        basePaid = perPayment;
+      }
+    } else {
+      for(let k=0;k<4;k++){
+        if(k===playerIdx) continue;
+        this.scores[k] -= perPayment;
+        basePaid += perPayment;
+      }
+    }
+    this.scores[playerIdx] += basePaid;
+
+    // ---- リーチ供託金の精算 ----
+    let reachBonus = 0;
+    if(this.reached[playerIdx]){
+      reachBonus += 100; // 自分が出した供託金が戻る
+      for(let k=0;k<4;k++){
+        if(k===playerIdx) continue;
+        reachBonus += 100;
+        if(!this.reached[k]){
+          this.scores[k] -= 100; // 未リーチの相手からは新たに徴収
+        }
+        // 相手がリーチ済みなら、その人の供託金をそのまま回収（二重取りしない）
+      }
+      this.scores[playerIdx] += reachBonus;
+    } else {
+      // 自分はリーチしていない＝場の供託金はそのまま出した本人に返却
+      for(let k=0;k<4;k++){
+        if(this.reached[k]) this.scores[k] += 100;
+      }
+    }
+
     this.roundOver = true;
     this.phase = 'roundEnd';
     this.lastRoundResult = playerIdx;
+    this.roundsPlayed = (this.roundsPlayed||0) + 1;
     const nm = PLAYER_NAMES[playerIdx];
     const sourceLabel = isTsurikinWin? '釣菌あがり' : 'ツモあがり';
-    const parts = [`「${best.label}」${best.pts}点`];
+
+    let yakuNote = '';
+    if(achieved.length>1){
+      const names = achieved.map(y=>y.label).join('と');
+      yakuNote = `${names}が揃っていますが、最も点数の高い「${best.label}」が採用されます。`;
+    }
+
+    const totalGain = basePaid + reachBonus;
+    const parts = [`「${best.label}」${best.pts}CFU`];
     if(tsumoBonus>0) parts.push(`ツモ+${tsumoBonus}`);
     if(isOya) parts.push('親2倍');
+    if(reachBonus>0) parts.push(`リーチ供託+${reachBonus}`);
     const breakdown = parts.join(' ／ ');
-    this.pushLog(`🏆 ${nm}が${sourceLabel}！ ${breakdown} → 合計+${total}点（${lap}巡目）`);
-    this.popup = winPopupHtml(nm, best.label, total, breakdown);
+    this.pushLog(`🏆 ${nm}が${sourceLabel}！ 上がり役：${best.label}${yakuNote? '　'+yakuNote : ''} ${breakdown} → 合計+${totalGain}CFU（${lap}巡目）`);
+    this.popup = winPopupHtml(nm, best.label, totalGain, breakdown + (yakuNote? `<br><span style="font-size:11px; color:#7C8A78;">${yakuNote}</span>` : ''));
     this.render();
+
+    // 精算が終わったのでリーチ状態をリセット
+    this.reached = [false,false,false,false];
+    this.reachTarget = [null,null,null,null];
+
+    const overNow = this.checkGameOver();
     setTimeout(()=>{
-      this.popup = standingsPopupHtml(this.scores);
+      this.popup = overNow? finalStandingsPopupHtml(this.scores, this.gameOverReason) : standingsPopupHtml(this.scores);
       this.render();
-      setTimeout(()=>{
-        this.popup = null;
-        this.setMsg(`<span class="win">🏆 ${nm}の${sourceLabel}！「${best.label}」 合計+${total}点</span>`);
-        this.render();
-      }, 1000);
+      if(!overNow){
+        setTimeout(()=>{
+          this.popup = null;
+          this.setMsg(`<span class="win">🏆 ${nm}の${sourceLabel}！「${best.label}」 合計+${totalGain}CFU</span>`);
+          this.render();
+        }, 1000);
+      }
     }, 1000);
     return true;
   },
@@ -1319,15 +1580,15 @@ const App = {
   advanceTurn(){
     this.turn = (this.turn+1)%4;
     if(this.wall.length===0 && !this.pending){
-      this.pushLog('山札が尽きました。流局です。');
-      this.setMsg('流局（山切れ）です。次のラウンドへ進みましょう。');
-      this.phase='roundEnd';
-      this.roundOver=true;
-      this.lastRoundResult='draw';
-      this.render();
+      this.triggerDraw('wall');
       return;
     }
     this.turnsTaken[this.turn] = (this.turnsTaken[this.turn]||0) + 1;
+    const maxLaps = this.settings? this.settings.maxLaps : 10;
+    if(maxLaps && this.turnsTaken[this.turn] > maxLaps){
+      this.triggerDraw('maxlaps');
+      return;
+    }
     this.phase='awaitAction';
     const lap = this.turnsTaken[this.turn];
     this.setMsg(this.turn===0
@@ -1351,12 +1612,37 @@ const App = {
     }
   },
   checkWallReplenish(){
+    if(this.settings && this.settings.wallRefill===false) return; // 「捨て札を山に戻さない」設定では補充しない
     if(this.wall.length===1 && this.deadPile.length>0){
       const recycled = shuffle(this.deadPile);
       this.wall = [...recycled, ...this.wall]; // 残り1枚の下に補充（その1枚が先に引かれる）
       this.pushLog(`山札が残り1枚になったため、捨て札${recycled.length}枚をシャッフルして山の下に補充しました。`);
       this.deadPile = [];
     }
+  },
+  triggerDraw(reason){
+    // 流局：供託中のリーチ金は出した本人にそのまま返却する
+    for(let k=0;k<4;k++){
+      if(this.reached[k]) this.scores[k] += 100;
+    }
+    this.reached = [false,false,false,false];
+    this.reachTarget = [null,null,null,null];
+    this.roundsPlayed = (this.roundsPlayed||0) + 1;
+    const reasonText = reason==='maxlaps'
+      ? `最大巡数（${this.settings? this.settings.maxLaps : 10}巡）に達したため流局です（供託中のリーチ金は返却されました）。`
+      : '山札が尽きました。流局です（供託中のリーチ金は返却されました）。';
+    this.pushLog(reasonText);
+    this.phase='roundEnd';
+    this.roundOver=true;
+    this.lastRoundResult='draw';
+    const overNow = this.checkGameOver();
+    if(overNow){
+      this.popup = finalStandingsPopupHtml(this.scores, this.gameOverReason);
+      this.setMsg('流局でゲーム終了です。');
+    } else {
+      this.setMsg('流局です。次のラウンドへ進みましょう。');
+    }
+    this.render();
   },
 
   /* ---- CPU AI ---- */
@@ -1375,7 +1661,7 @@ const App = {
       let drawnCard, useTsurikin=false;
       if(this.pending && this.pending.card.tags.includes(this.reachTarget[p])){
         const target = this.reachTarget[p];
-        const oldLeftover = this.hands[p].find(c=>!c.tags.includes(target));
+        const oldLeftover = this.hands[p].find(c=>!c.tags.includes(target) && !this.openIds[p].includes(c.id));
         if(oldLeftover){
           const simulatedHand = this.hands[p].filter(c=>c.id!==oldLeftover.id).concat([this.pending.card]);
           const achieved = achievedYaku(simulatedHand);
@@ -1387,24 +1673,26 @@ const App = {
       }
       if(useTsurikin){
         drawnCard = this.pending.card;
-        const fromName = PLAYER_NAMES[this.pending.by];
+        const fromIdx = this.pending.by;
+        const fromName = PLAYER_NAMES[fromIdx];
         hand.push(drawnCard);
         this.lastDraw[p] = 'tsurikin';
-        this.pushLog(`${PLAYER_NAMES[p]}は${fromName}の捨てた「${drawnCard.name}」を釣菌しました。`);
+        this.lastDrawFrom[p] = fromIdx;
+        this.openIds[p].push(drawnCard.id);
+        this.pushLog(`${PLAYER_NAMES[p]}は${fromName}の捨てた「${drawnCard.name}」を釣菌しました。（公開されます）`);
         this.pending = null;
         this.removeFromDiscardLog(drawnCard.id);
       } else {
         if(this.pending) this.archivePending();
         if(this.wall.length===0){
-          this.pushLog('山札が尽きました。流局です。');
-          this.setMsg('流局（山切れ）です。次のラウンドへ進みましょう。');
-          this.phase='roundEnd'; this.roundOver=true; this.lastRoundResult='draw'; this.render();
+          this.triggerDraw("wall");
           return;
         }
         drawnCard = this.wall.pop();
         this.checkWallReplenish();
         hand.push(drawnCard);
         this.lastDraw[p] = 'wall';
+        this.lastDrawFrom[p] = null;
         this.pushLog(`${PLAYER_NAMES[p]}は山から引きました。`);
       }
       this.handleForcedAfterDraw(p, drawnCard, ()=>{
@@ -1434,24 +1722,26 @@ const App = {
     }
     if(useTsurikin){
       const card = this.pending.card;
-      const fromName = PLAYER_NAMES[this.pending.by];
+      const fromIdx = this.pending.by;
+      const fromName = PLAYER_NAMES[fromIdx];
       hand.push(card);
       this.lastDraw[p] = 'tsurikin';
-      this.pushLog(`${PLAYER_NAMES[p]}は${fromName}の捨てた「${card.name}」を釣菌しました。`);
+      this.lastDrawFrom[p] = fromIdx;
+      this.openIds[p].push(card.id);
+      this.pushLog(`${PLAYER_NAMES[p]}は${fromName}の捨てた「${card.name}」を釣菌しました。（公開されます）`);
       this.pending = null;
       this.removeFromDiscardLog(card.id);
     } else {
       if(this.pending) this.archivePending();
       if(this.wall.length===0){
-        this.pushLog('山札が尽きました。流局です。');
-        this.setMsg('流局（山切れ）です。次のラウンドへ進みましょう。');
-        this.phase='roundEnd'; this.roundOver=true; this.lastRoundResult='draw'; this.render();
+        this.triggerDraw("wall");
         return;
       }
       const card = this.wall.pop();
       this.checkWallReplenish();
       hand.push(card);
       this.lastDraw[p] = 'wall';
+      this.lastDrawFrom[p] = null;
       this.pushLog(`${PLAYER_NAMES[p]}は山から引きました。`);
     }
     this.setMsg(`${PLAYER_NAMES[p]}が捨て札を選んでいます…`);
@@ -1463,49 +1753,48 @@ const App = {
     const hand = this.hands[p]; // length 6
     let bestRemoveIdx=-1, bestAfter=null;
     hand.forEach((c,idx)=>{
+      if(this.openIds[p].includes(c.id)) return; // 公開済み(釣菌で取った)カードは捨てる対象にしない
       const rest = hand.filter((_,i)=>i!==idx);
       const bt = bestTarget(rest);
       if(!bestAfter || bt.cnt>bestAfter.cnt || (bt.cnt===bestAfter.cnt && bt.pts>bestAfter.pts)){
         bestAfter=bt; bestRemoveIdx = idx;
       }
     });
+    if(bestRemoveIdx===-1){
+      // 全カードが公開済みで捨てられない（理論上ほぼ起こらない）安全策
+      this.advanceTurn();
+      return;
+    }
+
+    // リーチ判定：まだリーチしておらず、供託金(100CFU)を払えて、この捨て方でちょうどテンパイ（cnt===4）になる場合のみ、
+    // 捨てると同時にリーチを宣言する（役が既に完成している場合はテンパイではないので対象外＝後出しリーチ不可）
+    const declaringReach = (!this.reached[p] && this.scores[p]>=100 && bestAfter && bestAfter.cnt===4);
+
     const [discarded] = hand.splice(bestRemoveIdx,1);
     this.pending = {card:discarded, by:p};
     this.discardLog.push({card:discarded, by:p});
-    this.pushLog(`${PLAYER_NAMES[p]}は「${discarded.name}」を捨てました。`);
-    this.render();
+
+    if(declaringReach){
+      this.reached[p] = true;
+      this.reachTarget[p] = bestAfter.key;
+      this.scores[p] -= 100;
+      this.pushLog(`🚩 ${PLAYER_NAMES[p]}は「${discarded.name}」を捨ててリーチしました！（「${bestAfter.label}」待ち・100CFU供託）`);
+      this.popup = reachPopupHtml(PLAYER_NAMES[p]);
+      this.render();
+      setTimeout(()=>{ this.popup = null; this.render(); }, 900);
+    } else {
+      this.pushLog(`${PLAYER_NAMES[p]}は「${discarded.name}」を捨てました。`);
+      this.render();
+    }
 
     this.processDiscard(discarded, p, ()=>{
       setTimeout(()=>{
-        this.tryCpuReach(p, ()=>{
-          const won = this.declareWin(p);
-          if(!won){
-            this.advanceTurn();
-          }
-        });
+        const won = this.declareWin(p);
+        if(!won){
+          this.advanceTurn();
+        }
       }, 550);
     });
-  },
-  tryCpuReach(p, cb){
-    if(this.reached[p] || this.roundOver){ if(cb) cb(); return false; }
-    const bt = bestTarget(this.hands[p]);
-    if(bt.cnt>=4){
-      this.reached[p] = true;
-      this.reachTarget[p] = bt.key;
-      const tag = bt.cnt>=5? '完成':'待ち';
-      this.pushLog(`🚩 ${PLAYER_NAMES[p]}がリーチ！（「${bt.label}」${tag}）`);
-      this.popup = reachPopupHtml(PLAYER_NAMES[p]);
-      this.render();
-      setTimeout(()=>{
-        this.popup = null;
-        this.render();
-        if(cb) cb();
-      }, 1000);
-      return true;
-    } else {
-      if(cb) cb();
-      return false;
-    }
   },
 
   /* ---------------- render ---------------- */
@@ -1515,7 +1804,7 @@ const App = {
     sb.innerHTML = PLAYER_NAMES.map((nm,i)=>`
       <div class="score-card${this.turn===i && !this.roundOver? ' active':''}">
         <div class="nm">${nm}${i===0?' 👤':' 🤖'}${this.reached[i]? ' 🚩':''}${this.oya===i? ' 👑':''}</div>
-        <div class="pt">${this.scores[i]}</div>
+        <div class="pt">${this.scores[i].toLocaleString()}<span style="font-size:10px; font-weight:600;"> CFU</span></div>
         ${this.turn===i && !this.roundOver? `<div class="tag">手番・${this.turnsTaken[i]||1}巡目</div>`:(this.reached[i] && !this.roundOver? '<div class="tag">リーチ中</div>':(this.oya===i? '<div class="tag">親</div>':''))}
       </div>`).join('');
 
@@ -1525,22 +1814,33 @@ const App = {
       if(seat) seat.classList.toggle('turn', this.turn===i && !this.roundOver);
     });
 
-    // cpu hands (face down, but opened for everyone once the round ends)
+    // cpu hands（釣菌で公開された札は常時オープン。それ以外は裏向き、ラウンド終了時は全公開）
     [1,2,3].forEach(i=>{
       const el = document.getElementById('hand-'+i);
-      if(this.roundOver){
-        el.innerHTML = this.hands[i].map(c=>cardHtml(c,{small:true})).join('');
-      } else {
-        el.innerHTML = this.hands[i].map(()=>`<div class="card-back"></div>`).join('');
-      }
+      el.innerHTML = this.hands[i].map(c=>{
+        const isOpen = this.openIds[i].includes(c.id);
+        if(this.roundOver) return cardHtml(c,{small:true, openLocked:isOpen});
+        if(isOpen) return cardHtml(c,{small:true, openLocked:true});
+        return `<div class="card-back"></div>`;
+      }).join('');
     });
 
     // your hand
     const yourHandEl = document.getElementById('hand-0');
     const canDiscard = this.phase==='awaitDiscard' && this.turn===0;
-    yourHandEl.innerHTML = this.hands[0].map(c=>
-      cardHtml(c,{clickable:canDiscard, onclick: canDiscard? `App.humanDiscard(${c.id})`:null})
-    ).join('');
+    yourHandEl.innerHTML = this.hands[0].map(c=>{
+      const isOpen = this.openIds[0].includes(c.id);
+      if(isOpen) return cardHtml(c,{openLocked:true});
+      let clickableNow = canDiscard;
+      let dimNow = false;
+      if(canDiscard && this.reachArmed){
+        const rest = this.hands[0].filter(x=>x.id!==c.id);
+        const bt = bestTarget(rest);
+        clickableNow = (bt.cnt===4);
+        dimNow = !clickableNow;
+      }
+      return cardHtml(c,{clickable:clickableNow, dim:dimNow, onclick: clickableNow? `App.humanDiscard(${c.id})`:null});
+    }).join('');
 
     // wall + discard feed
     document.getElementById('wall-count').textContent = this.wall.length;
@@ -1584,7 +1884,7 @@ const App = {
           const card = this.hands[0].find(c=>c.id===this.zoomSelectedId);
           if(card){
             const matchedYaku = YAKU.filter(y=>card.tags.includes(y.key)).sort((a,b)=>b.pts-a.pts);
-            const list = matchedYaku.map(y=>`「${y.label}」(${y.pts}点)`).join('、');
+            const list = matchedYaku.map(y=>`「${y.label}」(${y.pts}CFU)`).join('、');
             infoHtml = `<b>${card.name}</b>（${card.classification}）が含まれる役：<br>${list || 'なし'}`;
           }
         }
@@ -1602,12 +1902,12 @@ const App = {
           ? `おすすめの捨て札は <b>${d.discardSuggestion.name}</b> です。`
           : '';
         const thresholdText = d.threshold>0
-          ? `現在${d.lap}巡目なので、上がるには${d.threshold}点以上の役が必要です。`
+          ? `現在${d.lap}巡目なので、上がるには${d.threshold}CFU以上の役が必要です。`
           : `現在${d.lap}巡目なので、役があればそのまま上がれます。`;
         modalRoot.innerHTML = `<div class="modal-overlay"><div class="modal-card">
           <h3>💡 アドバイス<button class="modal-close" onclick="App.closeAdvice()">閉じる ✕</button></h3>
           <div class="advice-highlight">
-            <div class="advice-line">おすすめの役：<b>${d.best.label}</b>（${d.best.pts}点）</div>
+            <div class="advice-line">おすすめの役：<b>${d.best.label}</b>（${d.best.pts}CFU）</div>
             <div class="advice-line">${discardText}</div>
             <div class="advice-line">${needText}</div>
           </div>
@@ -1632,19 +1932,20 @@ const App = {
       html += `<button class="btn btn-gold" onclick="App.startRound()">▶ 次のラウンドへ</button>`;
     } else if(this.turn===0){
       if(this.phase==='awaitAction'){
+        const tsurikinDisabled = !this.pending || (this.reached[0] && !this.pending.card.tags.includes(this.reachTarget[0]));
         html += `<button class="btn btn-primary" onclick="App.drawFromWall()" ${this.wall.length===0&&!this.pending?'disabled':''}>🀫 山から引く</button>`;
-        html += `<button class="btn btn-outline" onclick="App.tsurikin()" ${this.pending? '':'disabled'}>🎣 釣菌する${this.pending? `（前の人の「${this.pending.card.name}」）`:''}</button>`;
+        html += `<button class="btn btn-outline" onclick="App.tsurikin()" ${tsurikinDisabled? 'disabled':''}>🎣 釣菌する${this.pending? `（前の人の「${this.pending.card.name}」）`:''}</button>`;
         if(this.hands[0].length===5){
           html += `<button class="btn btn-gold" onclick="App.declareWin(0)">🏆 あがり宣言</button>`;
         }
       } else if(this.phase==='awaitDiscard'){
+        const canReachToggle = !this.reached[0] && this.scores[0]>=100;
         html += `<span style="font-size:12px;color:#7C8A78;align-self:center;">手札からカードをタップして捨ててください（6枚→5枚）</span>`;
+        if(canReachToggle){
+          html += `<button class="btn btn-outline${this.reachArmed? ' reach-armed':''}" onclick="App.toggleReachArm()" style="border-color:var(--gold); color:#B8852B;">🚩 ${this.reachArmed? 'リーチする札をタップ（解除）':'リーチして捨てる'}</button>`;
+        }
       } else if(this.phase==='postDiscard'){
         html += `<button class="btn btn-gold" onclick="App.declareWin(0)">🏆 あがり宣言</button>`;
-        if(!this.reached[0] && bestTarget(this.hands[0]).cnt>=4){
-          const isComplete = bestTarget(this.hands[0]).cnt>=5;
-          html += `<button class="btn btn-outline" onclick="App.declareReach(0)" style="border-color:var(--gold); color:#B8852B;">🚩 リーチ宣言${isComplete? '（役完成）':''}</button>`;
-        }
         html += `<button class="btn btn-outline" onclick="App.endTurn()">➡ 次の人へ</button>`;
       }
     } else {
