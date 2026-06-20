@@ -642,7 +642,8 @@ function cardHtml(card, opts={}){
   const openCls = opts.openLocked? ' open-locked':'';
   const dimCls = opts.dim? ' dim-disabled':'';
   const onclick = opts.onclick? ` onclick="${opts.onclick}"`:'';
-  return `<div class="mcard cls-${card.classKey}${small}${clickable}${openCls}${dimCls}"${onclick} title="${card.classification}">
+  const titleText = opts.titleOverride? opts.titleOverride : card.classification;
+  return `<div class="mcard cls-${card.classKey}${small}${clickable}${openCls}${dimCls}"${onclick} title="${titleText}">
     ${opts.openLocked? '<div class="open-badge">🔓晒</div>':''}
     <div class="art"><img src="${card.img}" alt="${card.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon">${card.icon}</span></div>
     <div class="nm">${card.name}</div>
@@ -1833,13 +1834,19 @@ const App = {
       if(isOpen) return cardHtml(c,{openLocked:true});
       let clickableNow = canDiscard;
       let dimNow = false;
+      let titleOverride = null;
       if(canDiscard && this.reachArmed){
         const rest = this.hands[0].filter(x=>x.id!==c.id);
         const bt = bestTarget(rest);
         clickableNow = (bt.cnt===4);
         dimNow = !clickableNow;
+        if(dimNow){
+          titleOverride = bt.cnt>=5
+            ? 'この札を捨てると役が完成済みのままになるため、リーチ対象外です（後出しリーチ禁止）。リーチせずそのまま捨てて「あがり宣言」してください。'
+            : 'この札を捨ててもテンパイ（あと1枚で役完成）にならないため、リーチ対象外です。';
+        }
       }
-      return cardHtml(c,{clickable:clickableNow, dim:dimNow, onclick: clickableNow? `App.humanDiscard(${c.id})`:null});
+      return cardHtml(c,{clickable:clickableNow, dim:dimNow, onclick: clickableNow? `App.humanDiscard(${c.id})`:null, titleOverride});
     }).join('');
 
     // wall + discard feed
@@ -1940,7 +1947,11 @@ const App = {
         }
       } else if(this.phase==='awaitDiscard'){
         const canReachToggle = !this.reached[0] && this.scores[0]>=100;
+        const alreadyComplete = bestTarget(this.hands[0]).cnt>=5;
         html += `<span style="font-size:12px;color:#7C8A78;align-self:center;">手札からカードをタップして捨ててください（6枚→5枚）</span>`;
+        if(alreadyComplete){
+          html += `<span style="font-size:11px;color:#B8852B;align-self:center; flex-basis:100%;">💡 すでに役が完成しています。リーチせずそのまま捨てて「あがり宣言」してください。</span>`;
+        }
         if(canReachToggle){
           html += `<button class="btn btn-outline${this.reachArmed? ' reach-armed':''}" onclick="App.toggleReachArm()" style="border-color:var(--gold); color:#B8852B;">🚩 ${this.reachArmed? 'リーチする札をタップ（解除）':'リーチして捨てる'}</button>`;
         }
