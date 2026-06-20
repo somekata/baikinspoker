@@ -1215,7 +1215,17 @@ const App = {
     if(this.reachArmed && !this.reached[0] && this.scores[0]>=100){
       const rest = this.hands[0].filter(c=>c.id!==cardId);
       const bt = bestTarget(rest);
-      if(bt.cnt!==4) return; // テンパイにならない捨て方ではリーチ宣言不可
+      if(bt.cnt!==4){
+        // この捨て方ではリーチにならない（テンパイにならない／すでに役完成済み）。捨てさせずに案内する。
+        const cardName = this.hands[0].find(c=>c.id===cardId)?.name || 'その札';
+        if(bt.cnt>=5){
+          this.setMsg(`<span class="win">🚩「${cardName}」を捨てると役が完成済みのままになるため、リーチにはなりません。</span>リーチをやめて、そのまま捨てて「あがり宣言」するか、別の札を選んでください。`);
+        } else {
+          this.setMsg(`<span class="win">🚩「${cardName}」を捨ててもテンパイにならないため、リーチにはなりません。</span>別の札を選ぶか、リーチをやめてください。`);
+        }
+        this.render();
+        return;
+      }
       const [card] = this.hands[0].splice(idx,1);
       this.pending = {card, by:0};
       this.discardLog.push({card, by:0});
@@ -1832,21 +1842,17 @@ const App = {
     yourHandEl.innerHTML = this.hands[0].map(c=>{
       const isOpen = this.openIds[0].includes(c.id);
       if(isOpen) return cardHtml(c,{openLocked:true});
-      let clickableNow = canDiscard;
-      let dimNow = false;
       let titleOverride = null;
       if(canDiscard && this.reachArmed){
         const rest = this.hands[0].filter(x=>x.id!==c.id);
         const bt = bestTarget(rest);
-        clickableNow = (bt.cnt===4);
-        dimNow = !clickableNow;
-        if(dimNow){
+        if(bt.cnt!==4){
           titleOverride = bt.cnt>=5
-            ? 'この札を捨てると役が完成済みのままになるため、リーチ対象外です（後出しリーチ禁止）。リーチせずそのまま捨てて「あがり宣言」してください。'
-            : 'この札を捨ててもテンパイ（あと1枚で役完成）にならないため、リーチ対象外です。';
+            ? 'この札を捨てると役が完成済みのままになるため、リーチにはなりません（タップすると詳しく案内します）。'
+            : 'この札を捨ててもテンパイにならないため、リーチにはなりません（タップすると詳しく案内します）。';
         }
       }
-      return cardHtml(c,{clickable:clickableNow, dim:dimNow, onclick: clickableNow? `App.humanDiscard(${c.id})`:null, titleOverride});
+      return cardHtml(c,{clickable:canDiscard, onclick: canDiscard? `App.humanDiscard(${c.id})`:null, titleOverride});
     }).join('');
 
     // wall + discard feed
