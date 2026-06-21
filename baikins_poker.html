@@ -662,6 +662,14 @@ function bestTarget(cards){
   });
   return best;
 }
+// 5枚の手札について、「一致枚数が一番多い役」だけでなく、テンパイ（4枚一致）になっている役を全て探す。
+// （オール肺感染のように一致しやすい役が同時に完成していても、他のレアな役がテンパイならそちらも見逃さないようにするため）
+function tenpaiYakuList(cards){
+  return YAKU
+    .map(y => ({key:y.key, label:y.label, pts:y.pts, cnt: cards.filter(c=>c.tags.includes(y.key)).length}))
+    .filter(y => y.cnt===4)
+    .sort((a,b)=> b.pts-a.pts);
+}
 function achievedYaku(hand){
   return YAKU.filter(y => hand.length===5 && hand.every(c=>c.tags.includes(y.key)));
 }
@@ -682,6 +690,17 @@ function reachPopupHtml(name){
   return `<div class="popup-overlay"><div class="popup-card">
     <div class="ptitle">🚩 リーチ！</div>
     <div class="psub">${name}</div>
+  </div></div>`;
+}
+function reachChoicePopupHtml(cardName, options){
+  const rows = options.map(o=>
+    `<button class="setting-opt" style="display:block; width:100%; text-align:left; margin-bottom:6px; padding:10px 14px; font-size:13px;" onclick="App.chooseReachTarget('${o.key}')">「${o.label}」待ち　<span style="float:right; color:var(--gold); font-weight:700;">${o.pts}CFU</span></button>`
+  ).join('');
+  return `<div class="popup-overlay"><div class="popup-card" style="max-width:360px;">
+    <div class="ptitle" style="font-size:18px;">🚩 どの役でリーチしますか？</div>
+    <div class="psub" style="font-size:12px;">「${cardName}」を捨てると、複数の役が同時にテンパイになります。狙う役を選んでください。</div>
+    <div style="margin-top:12px; text-align:left;">${rows}</div>
+    <button class="btn btn-outline" style="margin-top:8px;" onclick="App.cancelReachChoice()">キャンセル</button>
   </div></div>`;
 }
 function winPopupHtml(name, yakuLabel, totalPts, breakdown){
@@ -999,6 +1018,7 @@ const App = {
   openIds:[[],[],[],[]],   // 釣菌して獲得し、公開・固定（捨てられない）になったカードidの一覧
   lastDrawFrom:[null,null,null,null],  // 直近のカードを誰の捨て札から釣菌したか（ツモの場合はnull）
   reachArmed:false,        // 「リーチして捨てる」モードがONか（捨てる瞬間にリーチ宣言するためのトグル）
+  pendingReachChoice:null, // {cardId, options} 複数の役が同時にテンパイになる場合の選択待ち状態
   roundsPlayed:0,           // 終了したラウンド数（安全装置用）
   gameOver:false,
   gameOverReason:null,
@@ -1137,6 +1157,7 @@ const App = {
     this.openIds = [[],[],[],[]];
     this.lastDrawFrom = [null,null,null,null];
     this.reachArmed = false;
+    this.pendingReachChoice = null;
     this.lastDraw = [null,null,null,null];
     this.popup = null;
     this.ronOffer = null;
@@ -1213,35 +1234,28 @@ const App = {
     const idx = this.hands[0].findIndex(c=>c.id===cardId);
     if(idx<0) return;
     if(this.reachArmed && !this.reached[0] && this.scores[0]>=100){
+      const card = this.hands[0][idx];
       const rest = this.hands[0].filter(c=>c.id!==cardId);
-      const bt = bestTarget(rest);
-      if(bt.cnt!==4){
-        // この捨て方ではリーチにならない（テンパイにならない／すでに役完成済み）。捨てさせずに案内する。
-        const cardName = this.hands[0].find(c=>c.id===cardId)?.name || 'その札';
+      const options = tenpaiYakuList(rest);
+      if(options.length===0){
+        // この捨て方ではどの役もテンパイにならない（無関係／全部完成済みなど）。捨てさせずに案内する。
+        const bt = bestTarget(rest);
         if(bt.cnt>=5){
-          this.setMsg(`<span class="win">🚩「${cardName}」を捨てると役が完成済みのままになるため、リーチにはなりません。</span>リーチをやめて、そのまま捨てて「あがり宣言」するか、別の札を選んでください。`);
+          this.setMsg(`<span class="win">🚩「${card.name}」を捨てると役が完成済みのままになるため、リーチにはなりません。</span>リーチをやめて、そのまま捨てて「あがり宣言」するか、別の札を選んでください。`);
         } else {
-          this.setMsg(`<span class="win">🚩「${cardName}」を捨ててもテンパイにならないため、リーチにはなりません。</span>別の札を選ぶか、リーチをやめてください。`);
+          this.setMsg(`<span class="win">🚩「${card.name}」を捨ててもテンパイにならないため、リーチにはなりません。</span>別の札を選ぶか、リーチをやめてください。`);
         }
         this.render();
         return;
       }
-      const [card] = this.hands[0].splice(idx,1);
-      this.pending = {card, by:0};
-      this.discardLog.push({card, by:0});
-      this.reached[0] = true;
-      this.reachTarget[0] = bt.key;
-      this.scores[0] -= 100;
-      this.reachArmed = false;
-      this.pushLog(`🚩 あなたは「${card.name}」を捨ててリーチしました！（「${bt.label}」待ち・100CFU供託）`);
-      this.popup = reachPopupHtml('あなた');
+      if(options.length===1){
+        this.executeReachDiscard(cardId, options[0]);
+        return;
+      }
+      // テンパイになる役が複数ある場合は、どれを狙うか選んでもらう
+      this.pendingReachChoice = {cardId, options};
+      this.popup = reachChoicePopupHtml(card.name, options);
       this.render();
-      setTimeout(()=>{ this.popup = null; this.render(); }, 900);
-      this.processDiscard(card, 0, ()=>{
-        this.phase='postDiscard';
-        this.setMsg(`🚩 リーチ中です。「${bt.label}」待ちです。「次の人へ」進めてください。`);
-        this.render();
-      });
       return;
     }
     this.reachArmed = false;
@@ -1256,6 +1270,41 @@ const App = {
       this.setMsg(`役が完成していれば「あがり宣言」を（${lapThresholdLabel(lap)}）。なければ「次の人へ」進めてください。`);
       this.render();
     });
+  },
+  executeReachDiscard(cardId, option){
+    // option: {key, label, pts} テンパイ対象として確定した役
+    const idx = this.hands[0].findIndex(c=>c.id===cardId);
+    if(idx<0) return;
+    const [card] = this.hands[0].splice(idx,1);
+    this.pending = {card, by:0};
+    this.discardLog.push({card, by:0});
+    this.reached[0] = true;
+    this.reachTarget[0] = option.key;
+    this.scores[0] -= 100;
+    this.reachArmed = false;
+    this.pendingReachChoice = null;
+    this.pushLog(`🚩 あなたは「${card.name}」を捨ててリーチしました！（「${option.label}」待ち・100CFU供託）`);
+    this.popup = reachPopupHtml('あなた');
+    this.render();
+    setTimeout(()=>{ this.popup = null; this.render(); }, 900);
+    this.processDiscard(card, 0, ()=>{
+      this.phase='postDiscard';
+      this.setMsg(`🚩 リーチ中です。「${option.label}」待ちです。「次の人へ」進めてください。`);
+      this.render();
+    });
+  },
+  chooseReachTarget(key){
+    const pc = this.pendingReachChoice;
+    if(!pc) return;
+    const option = pc.options.find(o=>o.key===key);
+    if(!option) return;
+    this.popup = null;
+    this.executeReachDiscard(pc.cardId, option);
+  },
+  cancelReachChoice(){
+    this.pendingReachChoice = null;
+    this.popup = null;
+    this.render();
   },
   forcedDiscard(p, cardId, note){
     const idx = this.hands[p].findIndex(c=>c.id===cardId);
@@ -1452,6 +1501,7 @@ const App = {
     this.openIds = [[],[],[],[]];
     this.lastDrawFrom = [null,null,null,null];
     this.reachArmed = false;
+    this.pendingReachChoice = null;
     this.lastDraw = [null,null,null,null];
     this.pushLog('🔄 親（あなた）が配り直しを行いました。');
     this.setMsg('配り直しました。あなたの番です。山から引くか、釣菌してください。');
@@ -1762,24 +1812,66 @@ const App = {
   cpuActDiscard(p){
     if(this.roundOver) return;
     const hand = this.hands[p]; // length 6
-    let bestRemoveIdx=-1, bestAfter=null;
-    hand.forEach((c,idx)=>{
-      if(this.openIds[p].includes(c.id)) return; // 公開済み(釣菌で取った)カードは捨てる対象にしない
-      const rest = hand.filter((_,i)=>i!==idx);
-      const bt = bestTarget(rest);
-      if(!bestAfter || bt.cnt>bestAfter.cnt || (bt.cnt===bestAfter.cnt && bt.pts>bestAfter.pts)){
-        bestAfter=bt; bestRemoveIdx = idx;
-      }
-    });
-    if(bestRemoveIdx===-1){
+    const openIds = this.openIds[p];
+    const candidateIdxs = [];
+    hand.forEach((c,idx)=>{ if(!openIds.includes(c.id)) candidateIdxs.push(idx); });
+    if(candidateIdxs.length===0){
       // 全カードが公開済みで捨てられない（理論上ほぼ起こらない）安全策
       this.advanceTurn();
       return;
     }
 
-    // リーチ判定：まだリーチしておらず、供託金(100CFU)を払えて、この捨て方でちょうどテンパイ（cnt===4）になる場合のみ、
-    // 捨てると同時にリーチを宣言する（役が既に完成している場合はテンパイではないので対象外＝後出しリーチ不可）
-    const declaringReach = (!this.reached[p] && this.scores[p]>=100 && bestAfter && bestAfter.cnt===4);
+    const lap = this.turnsTaken[p] || 1;
+    const threshold = lapThreshold(lap);
+
+    // ① まず、その場であがれる捨て方があるか確認（最優先）
+    let winIdx=-1, winYaku=null;
+    candidateIdxs.forEach(idx=>{
+      const rest = hand.filter((_,i)=>i!==idx);
+      const achieved = achievedYaku(rest).filter(y=>y.pts>=threshold);
+      if(achieved.length>0){
+        const best = achieved.reduce((a,b)=> b.pts>a.pts? b:a);
+        if(!winYaku || best.pts>winYaku.pts){ winYaku=best; winIdx=idx; }
+      }
+    });
+
+    let bestRemoveIdx, declaringReach=false, reachOption=null;
+
+    if(winIdx>=0){
+      bestRemoveIdx = winIdx;
+    } else {
+      // ② あがれない場合は、テンパイになる役（一致枚数が多い役の陰に隠れているものも含め全て）の中から
+      //    一番点数の高いものを探してリーチを狙う
+      let bestReachIdx=-1, bestReachOption=null;
+      if(!this.reached[p] && this.scores[p]>=100){
+        candidateIdxs.forEach(idx=>{
+          const rest = hand.filter((_,i)=>i!==idx);
+          const options = tenpaiYakuList(rest); // pts降順ソート済み
+          if(options.length>0){
+            const top = options[0];
+            if(!bestReachOption || top.pts>bestReachOption.pts){
+              bestReachOption = top; bestReachIdx = idx;
+            }
+          }
+        });
+      }
+      if(bestReachIdx>=0){
+        bestRemoveIdx = bestReachIdx;
+        declaringReach = true;
+        reachOption = bestReachOption;
+      } else {
+        // ③ どちらも狙えない場合は、従来通り「一致枚数が多い役」を維持する捨て方を選ぶ
+        let ba=null, bi=-1;
+        candidateIdxs.forEach(idx=>{
+          const rest = hand.filter((_,i)=>i!==idx);
+          const bt = bestTarget(rest);
+          if(!ba || bt.cnt>ba.cnt || (bt.cnt===ba.cnt && bt.pts>ba.pts)){
+            ba=bt; bi=idx;
+          }
+        });
+        bestRemoveIdx = bi;
+      }
+    }
 
     const [discarded] = hand.splice(bestRemoveIdx,1);
     this.pending = {card:discarded, by:p};
@@ -1787,9 +1879,9 @@ const App = {
 
     if(declaringReach){
       this.reached[p] = true;
-      this.reachTarget[p] = bestAfter.key;
+      this.reachTarget[p] = reachOption.key;
       this.scores[p] -= 100;
-      this.pushLog(`🚩 ${PLAYER_NAMES[p]}は「${discarded.name}」を捨ててリーチしました！（「${bestAfter.label}」待ち・100CFU供託）`);
+      this.pushLog(`🚩 ${PLAYER_NAMES[p]}は「${discarded.name}」を捨ててリーチしました！（「${reachOption.label}」待ち・100CFU供託）`);
       this.popup = reachPopupHtml(PLAYER_NAMES[p]);
       this.render();
       setTimeout(()=>{ this.popup = null; this.render(); }, 900);
@@ -1845,11 +1937,16 @@ const App = {
       let titleOverride = null;
       if(canDiscard && this.reachArmed){
         const rest = this.hands[0].filter(x=>x.id!==c.id);
-        const bt = bestTarget(rest);
-        if(bt.cnt!==4){
+        const options = tenpaiYakuList(rest);
+        if(options.length===0){
+          const bt = bestTarget(rest);
           titleOverride = bt.cnt>=5
             ? 'この札を捨てると役が完成済みのままになるため、リーチにはなりません（タップすると詳しく案内します）。'
             : 'この札を捨ててもテンパイにならないため、リーチにはなりません（タップすると詳しく案内します）。';
+        } else if(options.length===1){
+          titleOverride = `この札を捨てると「${options[0].label}」待ちでリーチできます（タップでリーチ）。`;
+        } else {
+          titleOverride = `この札を捨てると複数の役が同時にテンパイになります（タップで選択）：${options.map(o=>o.label).join('／')}`;
         }
       }
       return cardHtml(c,{clickable:canDiscard, onclick: canDiscard? `App.humanDiscard(${c.id})`:null, titleOverride});
@@ -1953,9 +2050,14 @@ const App = {
         }
       } else if(this.phase==='awaitDiscard'){
         const canReachToggle = !this.reached[0] && this.scores[0]>=100;
-        const alreadyComplete = bestTarget(this.hands[0]).cnt>=5;
+        const lap0 = this.turnsTaken[0] || 1;
+        const threshold0 = lapThreshold(lap0);
+        const hasImmediateWin = this.hands[0].some(c=>{
+          const rest = this.hands[0].filter(x=>x.id!==c.id);
+          return achievedYaku(rest).some(y=>y.pts>=threshold0);
+        });
         html += `<span style="font-size:12px;color:#7C8A78;align-self:center;">手札からカードをタップして捨ててください（6枚→5枚）</span>`;
-        if(alreadyComplete){
+        if(hasImmediateWin){
           html += `<span style="font-size:11px;color:#B8852B;align-self:center; flex-basis:100%;">💡 すでに役が完成しています。リーチせずそのまま捨てて「あがり宣言」してください。</span>`;
         }
         if(canReachToggle){
