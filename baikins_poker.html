@@ -618,7 +618,7 @@ const CARD_DEFS = [
 
 const CARDS = CARD_DEFS.map((d,i)=>({
   id:i, name:d[0], classification:d[1], classKey:d[2], tags:d[3], latin:d[4], icon:d[5],
-  img: `https://www.omu.ac.jp/med/bacteriology/online/image/card/sm-card-${String(i+1).padStart(2,'0')}.png`
+  img: `img/sm-card-${String(i+1).padStart(2,'0')}.png`
 }));
 
 const PLAYER_NAMES = ["あなた","CPU①","CPU②","CPU③"];
