@@ -178,7 +178,7 @@
   @media (max-width: 560px) { .sci { display: none; } .no { display: none; } }
 
   /* ---------- INFO / LINK ---------- */
-  .panel-body { padding: 8px 0 clamp(32px, 6vw, 64px); max-width: 760px; }
+  .panel-body { padding: 8px 0 clamp(32px, 6vw, 64px); max-width: 900px; }
   .panel-body h2 { margin: 0 0 16px; font-size: clamp(24px, 4vw, 34px); font-weight: 800; letter-spacing: -.01em; line-height: 1.15; }
   .panel-body h2 small { margin-left: .6em; font-size: .5em; color: var(--sub); font-weight: 500; letter-spacing: 0; }
   .tips { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
@@ -225,6 +225,66 @@
     background: var(--k); border: 2.5px solid var(--edge); color: #000;
   }
   .lk .go svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* INFO: カードの見かた */
+  .sec { margin: 0 0 clamp(36px, 6vw, 56px); }
+  .sec > h2 { margin-top: 0; }
+  .anatomy { display: grid; grid-template-columns: minmax(0, 290px) minmax(0, 1fr); gap: clamp(18px, 4vw, 36px); align-items: start; }
+  .demo { margin: 0; position: sticky; top: 76px; }
+  .demo-card { position: relative; }
+  .demo-card img {
+    display: block; width: 100%; height: auto;
+    border-radius: 5.5% / 4%; border: 2.5px solid var(--edge);
+    box-shadow: 6px 6px 0 var(--b);
+  }
+  .pin {
+    position: absolute; display: grid; place-items: center;
+    width: 24px; height: 24px; margin: -12px 0 0 -12px;
+    border-radius: 50%; background: var(--yellow); color: #000;
+    border: 2px solid #000; font: 800 13px/1 var(--font);
+  }
+  .demo figcaption { margin-top: 14px; font-size: 13px; color: var(--sub); }
+
+  .guide { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .guide > li {
+    padding: 14px 16px 16px; border: 2.5px solid var(--edge); border-radius: 18px;
+    background: var(--surface); box-shadow: 4px 4px 0 var(--edge);
+  }
+  .guide h3 { margin: 0 0 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 17px; line-height: 1.3; }
+  .guide h3 .n {
+    flex: none; display: grid; place-items: center; width: 26px; height: 26px;
+    border-radius: 50%; background: var(--yellow); color: #000; border: 2px solid #000;
+    font-size: 13px; font-weight: 800;
+  }
+  .guide h3 small { font-weight: 500; color: var(--sub); font-size: 13px; }
+  .guide p { margin: 4px 0 0; font-size: 15px; }
+  .guide p small { display: block; margin-top: 2px; color: var(--sub); font-size: 13px; }
+
+  .bg-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .bg-list li { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border: 2px solid var(--edge); border-radius: 14px; background: var(--bg); }
+  .mk { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--c); border: 2px solid #000; color: #000; }
+  .mk svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .bg-list b { display: block; font-size: 15px; line-height: 1.25; }
+  .bg-list small { display: block; margin-top: 1px; font-size: 12.5px; color: var(--sub); line-height: 1.35; }
+
+  .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; }
+  .chips li { padding: 4px 12px; border: 2px solid var(--edge); border-radius: 14px; background: var(--bg); font-size: 14px; font-weight: 700; line-height: 1.35; }
+  .chips li small { display: block; font-weight: 500; color: var(--sub); font-size: 11.5px; }
+  .chips.fld li { display: flex; align-items: center; gap: 8px; border-radius: 999px; padding: 6px 14px 6px 10px; }
+  .chips.fld i { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--d); border: 2px solid #000; }
+  .chips.fld small { display: inline; margin-left: 2px; }
+
+  .abbr { margin-top: 10px; }
+  .abbr summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: 700; font-size: 15px; }
+  .abbr summary span { color: var(--sub); font-weight: 500; font-size: 13px; }
+  .abbr dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 4px 0 0; font-size: 14px; }
+  .abbr dt { font-weight: 800; }
+  .abbr dd { margin: 0; }
+
+  @media (max-width: 760px) {
+    .anatomy { grid-template-columns: 1fr; }
+    .demo { position: static; max-width: 290px; }
+  }
 
   /* ---------- ライトボックス ---------- */
   #lb {
@@ -305,34 +365,131 @@
 
   <section id="panel-info" role="tabpanel" aria-labelledby="tab-info" hidden>
     <div class="panel-body">
-      <h2>使い方<small>How to use</small></h2>
-      <ul class="tips">
-        <li style="--k: var(--yellow)">
-          <span class="k" style="--k: var(--yellow)">Tap</span>
-          <div><b>カードを押す</b><p>表と裏の解説が大きく開きます。<small>Tap a card to open its front and back.</small></p></div>
-        </li>
-        <li>
-          <span class="k" style="--k: var(--sky)">Browse</span>
-          <div><b>前後のカードへ</b><p><kbd>←</kbd> <kbd>→</kbd> キー、画面の ‹ › ボタン、スマホでは左右スワイプで移動できます。<small>Use the arrow keys, the on-screen buttons, or swipe on a phone.</small></p></div>
-        </li>
-        <li>
-          <span class="k" style="--k: var(--pink)">Close</span>
-          <div><b>閉じる</b><p><kbd>Esc</kbd> キー、右上の × ボタン、カードの外側をタップします。<small>Press Esc, tap ×, or tap outside the card.</small></p></div>
-        </li>
-        <li>
-          <span class="k" style="--k: #a78bfa">Theme</span>
-          <div><b>ライト／ダーク</b><p>右上のボタンで切り替えます。選んだ設定は次回も使われます。<small>Switch light and dark at the top right. Your choice is remembered.</small></p></div>
-        </li>
-        <li>
-          <span class="k" style="--k: var(--n)">Glow</span>
-          <div><b>枠の色</b><p>カードに触れると、そのカードの枠の色でページが光ります。<small>Hover a card and the page glows in its frame color.</small></p></div>
-        </li>
-        <li>
-          <span class="k" style="--k: var(--r)">Names</span>
-          <div><b>名前の表記</b><p>属名・種名はイタリックです。血清型（例：<i>Salmonella</i> Typhi の Typhi）は立体にしています。<small>Genus and species are italic; serotypes stay upright.</small></p></div>
-        </li>
-      </ul>
-      <p class="note">各カードの表がキャラクター、裏が微生物の解説です。英語名はこのページ用に付けた短い表記です。<br>The front of each card is the character, the back explains the microbe. English names are short labels added for this page.</p>
+
+      <div class="sec">
+        <h2>カードの見かた<small>How to read a card</small></h2>
+        <div class="anatomy">
+          <figure class="demo">
+            <div class="demo-card">
+              <img src="img/sm-card-05.png" alt="例として、05 ダイチョーキンのカード。番号は右の説明に対応しています。">
+              <span class="pin" style="left:7%;top:7%" aria-hidden="true">1</span>
+              <span class="pin" style="left:6%;top:54.5%" aria-hidden="true">2</span>
+              <span class="pin" style="left:95%;top:54.5%" aria-hidden="true">3</span>
+              <span class="pin" style="left:6%;top:62.5%" aria-hidden="true">4</span>
+              <span class="pin" style="left:6%;top:71%" aria-hidden="true">5</span>
+              <span class="pin" style="left:95%;top:64%" aria-hidden="true">6</span>
+            </div>
+            <figcaption>例：05 ダイチョーキン<br>Example: card 05</figcaption>
+          </figure>
+
+          <ol class="guide">
+            <li>
+              <h3><span class="n">1</span>背景と左上のマーク<small>Background and badge</small></h3>
+              <p>背景の色と左上のマークは、キャラクターの分類を表します。</p>
+              <ul class="bg-list">
+                <li style="--c: var(--g)"><span class="mk"><svg viewBox="0 0 24 24"><path d="M4 9l8-5 8 5H4zM6.5 11.5v6M10.5 11.5v6M13.5 11.5v6M17.5 11.5v6M3.5 20h17"/></svg></span><div><b>皇族系</b><small>黄色の背景 / Royal family<br><span data-count="g"></span>枚</small></div></li>
+                <li style="--c: var(--b)"><span class="mk"><svg viewBox="0 0 24 24"><path d="M12 3.5c3.5 4.2 6 7 6 10.2a6 6 0 0 1-12 0c0-3.2 2.5-6 6-10.2z"/></svg></span><div><b>水系</b><small>青色の背景 / Water<br><span data-count="b"></span>枚</small></div></li>
+                <li style="--c: var(--n)"><span class="mk"><svg viewBox="0 0 24 24"><path d="M6 20c0-5 .8-8 2-11M12 20c0-6 0-10 0-14M18 20c0-5-.8-8-2-11M4 20h16"/></svg></span><div><b>野外系</b><small>緑色の背景 / Outdoors<br><span data-count="n"></span>枚</small></div></li>
+                <li style="--c: var(--r)"><span class="mk"><svg viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4.2 0 2 1 3 2 3 0-3-1-5 1-8.8z"/></svg></span><div><b>熱帯系</b><small>赤色の背景 / Tropical<br><span data-count="r"></span>枚</small></div></li>
+                <li style="--c: var(--t)"><span class="mk"><svg viewBox="0 0 24 24"><path d="M4 20V8h3v2h2V8h6v2h2V8h3v12zM10 20v-4a2 2 0 0 1 4 0v4"/></svg></span><div><b>マクロファー寺</b><small>茶色系の背景 / Macrophage temple<br><span data-count="t"></span>枚</small></div></li>
+              </ul>
+            </li>
+
+            <li>
+              <h3><span class="n">2</span>Type<small>菌の種類 / Microbe type</small></h3>
+              <p>グラム染色性と形、真菌の形態で分けた10種類です。</p>
+              <ul class="chips">
+                <li>グラム陽性双球菌<small>Gram-positive diplococci</small></li>
+                <li>グラム陽性連鎖状球菌<small>Gram-positive streptococci</small></li>
+                <li>グラム陽性ブドウ状球菌<small>Gram-positive staphylococci</small></li>
+                <li>グラム陰性桿菌<small>Gram-negative rods</small></li>
+                <li>グラム陽性桿菌<small>Gram-positive rods</small></li>
+                <li>非定型菌<small>Atypical bacteria</small></li>
+                <li>抗酸菌<small>Acid-fast bacteria</small></li>
+                <li>酵母様真菌<small>Yeast-like fungi</small></li>
+                <li>糸状菌<small>Filamentous fungi</small></li>
+                <li>二形性真菌<small>Dimorphic fungi</small></li>
+              </ul>
+            </li>
+
+            <li>
+              <h3><span class="n">3</span>Field<small>感染しやすい部位 / Common infection sites</small></h3>
+              <p>4つのアイコンのうち、色がついているものが感染しやすい部位です。灰色のものは当てはまりません。<small>Colored icons show where the microbe tends to infect. Gray icons do not apply.</small></p>
+              <ul class="chips fld">
+                <li><i style="--d:#4aa3e0"></i>脳<small>Brain</small></li>
+                <li><i style="--d:#f08a5d"></i>肺<small>Lung</small></li>
+                <li><i style="--d:#d64545"></i>胃腸<small>Gut</small></li>
+                <li><i style="--d:#f2c230"></i>尿路<small>Urinary tract</small></li>
+              </ul>
+            </li>
+
+            <li>
+              <h3><span class="n">4</span>Offence<small>病原性 / Virulence</small></h3>
+              <p>病原性の強さを星で表します。とくに、バイオセーフティレベル（BSL）に近い考え方です。<small>Stars show how strongly the microbe causes disease, close to the idea of biosafety levels (BSL).</small></p>
+            </li>
+
+            <li>
+              <h3><span class="n">5</span>Defense<small>感受性 / Susceptibility</small></h3>
+              <p>薬の効きにくさ、つまり耐性の程度を星で表します。星が多いほど耐性が強く、1行が1つの株の型です。<small>Stars show the degree of resistance to antimicrobials. More stars mean stronger resistance; each row is one strain type.</small></p>
+              <details class="abbr">
+                <summary>耐性株の略称を見る<span>&nbsp;Abbreviations</span></summary>
+                <dl>
+                  <dt>Nomal</dt><dd>通常株（耐性を持たない株）</dd>
+                  <dt>PRSP</dt><dd>ペニシリン耐性肺炎球菌</dd>
+                  <dt>BLPAR</dt><dd>β-ラクタマーゼ産生アンピシリン耐性</dd>
+                  <dt>BLNAR</dt><dd>β-ラクタマーゼ非産生アンピシリン耐性</dd>
+                  <dt>BLPACR</dt><dd>β-ラクタマーゼ産生アモキシシリン・クラブラン酸耐性</dd>
+                  <dt>MRSA</dt><dd>メチシリン耐性黄色ブドウ球菌</dd>
+                  <dt>VRSA</dt><dd>バンコマイシン耐性黄色ブドウ球菌</dd>
+                  <dt>ESBL</dt><dd>基質特異性拡張型β-ラクタマーゼ産生菌</dd>
+                  <dt>CRE</dt><dd>カルバペネム耐性腸内細菌目細菌</dd>
+                  <dt>MBL</dt><dd>メタロβ-ラクタマーゼ産生菌</dd>
+                  <dt>OXA</dt><dd>OXA型カルバペネマーゼ産生菌</dd>
+                  <dt>MDR</dt><dd>多剤耐性</dd>
+                  <dt>XDR</dt><dd>超多剤耐性</dd>
+                </dl>
+              </details>
+            </li>
+
+            <li>
+              <h3><span class="n">6</span>Memo<small>そのほかの特徴 / Other traits</small></h3>
+              <p>そのキャラクターや微生物の、そのほかの特徴が書かれています。</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h2>操作方法<small>How to use</small></h2>
+        <ul class="tips">
+          <li>
+            <span class="k" style="--k: var(--yellow)">Tap</span>
+            <div><b>カードを押す</b><p>表と裏の解説が大きく開きます。<small>Tap a card to open its front and back.</small></p></div>
+          </li>
+          <li>
+            <span class="k" style="--k: var(--sky)">Browse</span>
+            <div><b>前後のカードへ</b><p><kbd>←</kbd> <kbd>→</kbd> キー、画面の ‹ › ボタン、スマホでは左右スワイプで移動できます。<small>Use the arrow keys, the on-screen buttons, or swipe on a phone.</small></p></div>
+          </li>
+          <li>
+            <span class="k" style="--k: var(--pink)">Close</span>
+            <div><b>閉じる</b><p><kbd>Esc</kbd> キー、右上の × ボタン、カードの外側をタップします。<small>Press Esc, tap ×, or tap outside the card.</small></p></div>
+          </li>
+          <li>
+            <span class="k" style="--k: #a78bfa">Theme</span>
+            <div><b>ライト／ダーク</b><p>右上のボタンで切り替えます。選んだ設定は次回も使われます。<small>Switch light and dark at the top right. Your choice is remembered.</small></p></div>
+          </li>
+          <li>
+            <span class="k" style="--k: var(--n)">Glow</span>
+            <div><b>背景の光</b><p>カードに触れると、そのカードの背景の色でページが光ります。<small>Hover a card and the page glows in its background color.</small></p></div>
+          </li>
+          <li>
+            <span class="k" style="--k: var(--r)">Names</span>
+            <div><b>名前の表記</b><p>属名・種名はイタリックです。血清型（例：<i>Salmonella</i> Typhi の Typhi）は立体にしています。<small>Genus and species are italic; serotypes stay upright.</small></p></div>
+          </li>
+        </ul>
+        <p class="note">各カードの表がキャラクター、裏が微生物の解説です。英語名はこのページ用に付けた短い表記です。<br>The front of each card is the character, the back explains the microbe. English names are short labels added for this page.</p>
+      </div>
+
     </div>
   </section>
 
@@ -476,6 +633,11 @@
     if (li) setGlow(COLOR[li.dataset.f]);
   });
   grid.addEventListener("focusout", () => setGlow(null));
+
+  // ---- INFO: 背景の分類ごとの枚数
+  const counts = {};
+  cards.forEach(c => { counts[c.f] = (counts[c.f] || 0) + 1; });
+  document.querySelectorAll("[data-count]").forEach(el => { el.textContent = counts[el.dataset.count] || 0; });
 
   // ---- タブ（MAIN / INFO / LINK）
   const tabs = [...document.querySelectorAll('[role="tab"]')];
